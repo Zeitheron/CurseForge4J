@@ -60,6 +60,8 @@ public class TestCF
 		System.out.println(prefix + "Downloads: " + file.downloads());
 		System.out.println(prefix + "Uploader: " + file.uploader());
 		System.out.println(prefix + "Uploaded: " + file.uploaded());
+		System.out.println(prefix + "Changelog: " + file.changelog());
+		System.out.println(prefix + "Size: " + file.size() + " (~" + file.sizeBytes() + " bytes)");
 		if(!file.additionalFiles().isEmpty())
 		{
 			System.out.println(prefix + "Additional files:");

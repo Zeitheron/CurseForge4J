@@ -94,7 +94,7 @@ public class GenericCurseforge implements ICurseForge
 					}
 				}
 				
-				return new BaseProject(name, overview, desc, avatar, thumbnail, created, lastUpdate, projectId, totalDownloads, members, this, url);
+				return new BaseProject(name, overview, CurseforgeAPI.$rlnk(desc), avatar, thumbnail, created, lastUpdate, projectId, totalDownloads, members, this, url);
 			}, 5, TimeUnit.MINUTES));
 		return projectCache.get(project.toLowerCase());
 	}

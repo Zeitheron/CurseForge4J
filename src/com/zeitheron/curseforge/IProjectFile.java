@@ -27,4 +27,10 @@ public interface IProjectFile
 	ProjectMember uploader();
 	
 	String url();
+	
+	String changelog();
+	
+	String size();
+	
+	long sizeBytes();
 }

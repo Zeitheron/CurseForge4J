@@ -92,6 +92,29 @@ public class CurseforgeAPI
 		return null;
 	}
 	
+	public static String $rlnk(String txt)
+	{
+		if(txt == null || txt.isEmpty() || !txt.contains("<a href=\"/linkout?remoteUrl="))
+			return txt;
+		
+		String cp = txt;
+		int i;
+		while((i = cp.indexOf("<a href=\"/linkout?remoteUrl=")) != -1)
+		{
+			String href = cp.substring(i + 28, cp.indexOf("\"", i + 28));
+			cp = cp.substring(i + 28 + href.length());
+			try
+			{
+				String valid = href.replaceAll("%253a", ":").replaceAll("%252f", "/");
+				txt = txt.replace("/linkout?remoteUrl=" + href, valid);
+			} catch(Throwable e)
+			{
+				e.printStackTrace();
+			}
+		}
+		return txt;
+	}
+	
 	private static class $
 	{
 		@SuppressWarnings({ "rawtypes", "unchecked" })

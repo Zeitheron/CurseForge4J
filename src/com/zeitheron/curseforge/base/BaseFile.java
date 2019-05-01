@@ -1,9 +1,10 @@
 package com.zeitheron.curseforge.base;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.zeitheron.curseforge.CurseforgeAPI;
@@ -15,14 +16,25 @@ import com.zeitheron.curseforge.data.ProjectMember;
 
 public class BaseFile implements IProjectFile
 {
+	private static final Map<String, Long> bytes = new HashMap<>();
+	static
+	{
+		bytes.put("kb", 1024L);
+		bytes.put("mb", 1024L * 1024L);
+		bytes.put("gb", 1024L * 1024L * 1024L);
+		bytes.put("tb", 1024L * 1024L * 1024L * 1024L);
+	}
+	
 	protected final IProject project;
 	protected final String id, displayName, fileName, md5;
 	protected final Date uploaded;
-	protected final long downloads;
+	protected final long downloads, sizel;
 	protected final List<FetchableFile> additionalFiles;
 	protected final ProjectMember uploader;
+	protected final String changelog;
+	protected final String size;
 	
-	public BaseFile(IProject project, String id, String displayName, String fileName, String md5, Date uploaded, long downloads, List<String> additionalFiles, ProjectMember uploader)
+	public BaseFile(IProject project, String id, String displayName, String fileName, String md5, Date uploaded, long downloads, List<String> additionalFiles, ProjectMember uploader, String changelog, String size)
 	{
 		this.project = project;
 		this.id = id;
@@ -33,6 +45,10 @@ public class BaseFile implements IProjectFile
 		this.downloads = downloads;
 		this.additionalFiles = additionalFiles.stream().map(fi -> new FetchableFile(project, fi)).collect(Collectors.toList());
 		this.uploader = uploader;
+		this.changelog = changelog;
+		this.size = size;
+		String[] val = size.split(" ");
+		this.sizel = Math.round(Double.parseDouble(val[0]) * bytes.getOrDefault(val[1].toLowerCase(), 1L));
 	}
 	
 	@Override
@@ -95,6 +111,12 @@ public class BaseFile implements IProjectFile
 		return uploader;
 	}
 	
+	@Override
+	public String changelog()
+	{
+		return changelog;
+	}
+	
 	public static IProjectFile create(IProject proj, String id)
 	{
 		String url = proj.url() + "/files/" + id;
@@ -132,6 +154,21 @@ public class BaseFile implements IProjectFile
 			}
 		}
 		
-		return new BaseFile(proj, id, displayName, fileName, md5, uploaded, downloads, fis, uploader);
+		String changelog = CurseforgeAPI.$rlnk(CurseforgeAPI.$cptr(page, "<div class=\"logbox\">", "</div></section>"));
+		String size = CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Size</div><div class=\"info-data\">", "</div>");
+		
+		return new BaseFile(proj, id, displayName, fileName, md5, uploaded, downloads, fis, uploader, changelog, size);
+	}
+
+	@Override
+	public String size()
+	{
+		return size;
+	}
+
+	@Override
+	public long sizeBytes()
+	{
+		return sizel;
 	}
 }
