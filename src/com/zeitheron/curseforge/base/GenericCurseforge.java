@@ -41,7 +41,9 @@ public class GenericCurseforge implements ICurseForge
 		if(!projectCache.containsKey(project.toLowerCase()))
 			projectCache.put(project.toLowerCase(), new Fetchable<>(() ->
 			{
-				String page = ICurseForge.getPage(CurseforgeAPI.$cfidg(game()) + "projects/" + project, true);
+				String url = CurseforgeAPI.$cfidg(game()) + "projects/" + project;
+				
+				String page = ICurseForge.getPage(url, true);
 				
 				String name = CurseforgeAPI.$cptr(page, "<meta property=\"og:title\" content=\"", "\"");
 				if(name == null)
@@ -92,7 +94,7 @@ public class GenericCurseforge implements ICurseForge
 					}
 				}
 				
-				return new BaseProject(name, overview, desc, avatar, thumbnail, created, lastUpdate, projectId, totalDownloads, members);
+				return new BaseProject(name, overview, desc, avatar, thumbnail, created, lastUpdate, projectId, totalDownloads, members, this, url);
 			}, 5, TimeUnit.MINUTES));
 		return projectCache.get(project.toLowerCase());
 	}
@@ -176,7 +178,7 @@ public class GenericCurseforge implements ICurseForge
 					return Collections.unmodifiableList(prs);
 				};
 				
-				return new BaseMember(registerDate, lastActive, avatar, name, new MemberPosts(comments, forumPosts), new MemberThanks(th_gvn, th_rcv), followers, projects);
+				return new BaseMember(registerDate, lastActive, avatar, name, new MemberPosts(comments, forumPosts), new MemberThanks(th_gvn, th_rcv), followers, projects, this, base);
 			}, 5, TimeUnit.MINUTES));
 		return memberCache.get(member.toLowerCase());
 	}

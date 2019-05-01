@@ -3,6 +3,7 @@ package com.zeitheron.curseforge;
 import java.util.Date;
 import java.util.List;
 
+import com.zeitheron.curseforge.data.ProjectFiles;
 import com.zeitheron.curseforge.data.ProjectMember;
 
 public interface IProject
@@ -28,4 +29,10 @@ public interface IProject
 	List<ProjectMember> membersList();
 	
 	ProjectMember[] membersArray();
+	
+	ProjectFiles files();
+	
+	String url();
+	
+	ICurseForge curseForge();
 }

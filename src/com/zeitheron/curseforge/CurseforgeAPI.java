@@ -4,8 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.zeitheron.curseforge.base.GenericCurseforge;
@@ -33,6 +35,22 @@ public class CurseforgeAPI
 	public static ICurseForge terraria()
 	{
 		return getCurseForge("terraria");
+	}
+	
+	public static List<String> $cptrs(String t, String s, String e)
+	{
+		List<String> v = new ArrayList<>();
+		
+		int i;
+		while((i = t.indexOf(s)) != -1)
+		{
+			t = t.substring(i + s.length());
+			int ei = t.indexOf(e);
+			if(ei != -1)
+				v.add(t.substring(0, ei));
+		}
+		
+		return v;
 	}
 	
 	public static String $cptr(String t, String s, String e)

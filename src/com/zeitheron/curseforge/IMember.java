@@ -24,4 +24,8 @@ public interface IMember
 	List<MembersProject> projects();
 	
 	long followers();
+	
+	ICurseForge curseForge();
+	
+	String url();
 }
