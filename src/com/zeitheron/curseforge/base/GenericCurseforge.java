@@ -8,13 +8,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import com.zeitheron.curseforge.CurseforgeAPI;
 import com.zeitheron.curseforge.ICurseForge;
 import com.zeitheron.curseforge.IMember;
 import com.zeitheron.curseforge.IProject;
+import com.zeitheron.curseforge.data.CurseForgePrefs;
 import com.zeitheron.curseforge.data.MemberPosts;
 import com.zeitheron.curseforge.data.MemberThanks;
 import com.zeitheron.curseforge.data.MembersProject;
@@ -26,6 +26,8 @@ public class GenericCurseforge implements ICurseForge
 	private static final SimpleDateFormat SDF1 = new SimpleDateFormat("MM/dd/yyyy");
 	
 	protected final String game;
+	
+	private final CurseForgePrefs prefs = new CurseForgePrefs();
 	
 	private final Map<String, Fetchable<IProject>> projectCache = new HashMap<>();
 	private final Map<String, Fetchable<IMember>> memberCache = new HashMap<>();
@@ -95,7 +97,7 @@ public class GenericCurseforge implements ICurseForge
 				}
 				
 				return new BaseProject(name, overview, CurseforgeAPI.$rlnk(desc), avatar, thumbnail, created, lastUpdate, projectId, totalDownloads, members, this, url);
-			}, 5, TimeUnit.MINUTES));
+			}, preferences().getCacheLifespan().getVal(), preferences().getCacheLifespan().getUnit()));
 		return projectCache.get(project.toLowerCase());
 	}
 	
@@ -179,7 +181,7 @@ public class GenericCurseforge implements ICurseForge
 				};
 				
 				return new BaseMember(registerDate, lastActive, avatar, name, new MemberPosts(comments, forumPosts), new MemberThanks(th_gvn, th_rcv), followers, projects, this, base);
-			}, 5, TimeUnit.MINUTES));
+			}, preferences().getCacheLifespan().getVal(), preferences().getCacheLifespan().getUnit()));
 		return memberCache.get(member.toLowerCase());
 	}
 	
@@ -187,5 +189,11 @@ public class GenericCurseforge implements ICurseForge
 	public String game()
 	{
 		return game;
+	}
+
+	@Override
+	public CurseForgePrefs preferences()
+	{
+		return prefs;
 	}
 }

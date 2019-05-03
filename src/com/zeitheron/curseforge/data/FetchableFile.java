@@ -1,7 +1,6 @@
 package com.zeitheron.curseforge.data;
 
-import java.util.concurrent.TimeUnit;
-
+import com.zeitheron.curseforge.ICurseForge;
 import com.zeitheron.curseforge.IProject;
 import com.zeitheron.curseforge.IProjectFile;
 import com.zeitheron.curseforge.base.BaseFile;
@@ -17,7 +16,8 @@ public class FetchableFile
 	{
 		this.project = project;
 		this.id = id;
-		this.file = new Fetchable<>(() -> BaseFile.create(project, id), 5, TimeUnit.MINUTES);
+		ICurseForge cf = project.curseForge();
+		this.file = new Fetchable<>(() -> BaseFile.create(project, id), cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
 	}
 	
 	public Fetchable<IProjectFile> asProjectFile()

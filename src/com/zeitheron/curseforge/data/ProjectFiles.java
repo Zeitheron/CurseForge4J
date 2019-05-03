@@ -2,7 +2,6 @@ package com.zeitheron.curseforge.data;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import com.zeitheron.curseforge.ICurseForge;
 import com.zeitheron.curseforge.IProject;
@@ -18,7 +17,8 @@ public class ProjectFiles
 	public ProjectFiles(IProject project)
 	{
 		this.project = project;
-		this.firstPage = new Fetchable<>(() -> ICurseForge.getPage(project.url() + "/files", true), 5, TimeUnit.MINUTES);
+		ICurseForge cf = project.curseForge();
+		this.firstPage = new Fetchable<>(() -> ICurseForge.getPage(project.url() + "/files", true), cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
 		this.pageCount = new Fetchable<>(() ->
 		{
 			int mp = 0;
@@ -34,7 +34,7 @@ public class ProjectFiles
 			if(mp == 0 && hasFile)
 				return 1;
 			return mp;
-		}, 5, TimeUnit.MINUTES);
+		}, cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
 	}
 	
 	public int pageCount()

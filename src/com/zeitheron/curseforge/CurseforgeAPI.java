@@ -6,35 +6,23 @@ import java.lang.reflect.Constructor;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.zeitheron.curseforge.base.GenericCurseforge;
+import com.zeitheron.curseforge.data.CurseForgePrefs;
 
 public class CurseforgeAPI
 {
-	public static final Map<String, ICurseForge> wrappers = new HashMap<>();
-	
-	static
-	{
-		wrappers.put("minecraft", $.create(GenericCurseforge.class, "minecraft"));
-		wrappers.put("terraria", $.create(GenericCurseforge.class, "terraria"));
-	}
-	
-	public static ICurseForge getCurseForge(String game)
-	{
-		return wrappers.get(game);
-	}
-	
 	public static ICurseForge minecraft()
 	{
-		return getCurseForge("minecraft");
+		return $.create(GenericCurseforge.class, "minecraft");
 	}
 	
-	public static ICurseForge terraria()
+	public static ICurseForge minecraft(CurseForgePrefs prefs)
 	{
-		return getCurseForge("terraria");
+		ICurseForge cf = $.create(GenericCurseforge.class, "minecraft");
+		cf.preferences().inheritFrom(prefs);
+		return cf;
 	}
 	
 	public static List<String> $cptrs(String t, String s, String e)

@@ -1,33 +1,44 @@
+import java.util.concurrent.TimeUnit;
+
 import com.zeitheron.curseforge.CurseforgeAPI;
 import com.zeitheron.curseforge.ICurseForge;
 import com.zeitheron.curseforge.IMember;
 import com.zeitheron.curseforge.IProject;
 import com.zeitheron.curseforge.IProjectFile;
+import com.zeitheron.curseforge.data.CurseForgePrefs;
 import com.zeitheron.curseforge.data.FetchableFile;
 import com.zeitheron.curseforge.data.MembersProject;
+import com.zeitheron.curseforge.data.TimeHolder;
 
 public class TestCF
 {
 	public static void main(String[] args)
 	{
+		CurseForgePrefs prefs = new CurseForgePrefs();
+		prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
+		ICurseForge mc = CurseforgeAPI.minecraft(prefs);
+		
+		// Print newest version of Hammer Lib
+		testFileList(mc);
+		
+		for(int i = 0; i < 8; ++i)
+			System.out.println();
+			
 		// Run first iteration - it is going to be slow, since we cache
 		// everything
-		// test();
-		
-		testFileList();
+		test(mc);
 		
 		for(int i = 0; i < 8; ++i)
 			System.out.println();
 			
 		// Run second iteration - it's very fast, since eveything is already
 		// cached.
-		// test();
+		test(mc);
 	}
 	
-	public static void testFileList()
+	public static void testFileList(ICurseForge mc)
 	{
-		ICurseForge mc = CurseforgeAPI.minecraft();
-		IProject project = mc.project("always-online").get();
+		IProject project = mc.project("hammer-lib").get();
 		
 		System.out.println("Name: " + project.name() + "; Overview: " + project.overview());
 		System.out.println("Description (HTML): " + project.description());
@@ -73,10 +84,8 @@ public class TestCF
 		}
 	}
 	
-	public static void test()
+	public static void test(ICurseForge mc)
 	{
-		ICurseForge mc = CurseforgeAPI.minecraft();
-		
 		IMember member = mc.member("Zeitheron").get();
 		
 		System.out.println("Name: " + member.name());
@@ -105,12 +114,7 @@ public class TestCF
 		
 		IProject project = member.projects().get(0).asProject().get();
 		
-		System.out.println("Name: " + project.name() + "; Overview: " + project.overview());
-		System.out.println("Description (HTML): " + project.description());
-		System.out.println("Avatar | Thumbnail: " + project.avatar() + " | " + project.thumbnail());
-		System.out.println("Total downloads: " + String.format("%,d", project.totalDownloads()));
-		System.out.println("Last updated: " + project.lastUpdate());
-		System.out.println("Created @: " + project.createTime());
-		System.out.println("Members: " + project.membersList());
+		System.out.println("Latest:");
+		printFileInfo(project.files().latest().asProjectFile().get(), "  ");
 	}
 }

@@ -2,7 +2,6 @@ package com.zeitheron.curseforge.base;
 
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import com.zeitheron.curseforge.ICurseForge;
@@ -32,7 +31,7 @@ public class BaseMember implements IMember
 		this.posts = posts;
 		this.thanks = thanks;
 		this.followers = followers;
-		this.projects = new Fetchable<>(projects, 5, TimeUnit.MINUTES);
+		this.projects = new Fetchable<>(projects, cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
 		this.cf = cf;
 		this.url = url;
 	}

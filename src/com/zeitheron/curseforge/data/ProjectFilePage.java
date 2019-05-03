@@ -2,7 +2,6 @@ package com.zeitheron.curseforge.data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.zeitheron.curseforge.ICurseForge;
@@ -19,6 +18,7 @@ public class ProjectFilePage
 	{
 		this.project = project;
 		this.page = page;
+		ICurseForge cf = project.curseForge();
 		this.files = new Fetchable<>(() ->
 		{
 			String pg;
@@ -39,7 +39,7 @@ public class ProjectFilePage
 			}
 			
 			return fis.stream().map(fi -> new FetchableFile(project, fi)).collect(Collectors.toList());
-		}, 5, TimeUnit.MINUTES);
+		}, cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
 	}
 	
 	public Fetchable<List<FetchableFile>> files()

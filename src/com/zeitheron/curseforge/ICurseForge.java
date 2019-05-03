@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import com.zeitheron.curseforge.data.CurseForgePrefs;
 import com.zeitheron.curseforge.fetcher.Fetchable;
 
 public interface ICurseForge
@@ -49,4 +50,6 @@ public interface ICurseForge
 			return CurseforgeAPI.$ets(e);
 		}
 	}
+	
+	CurseForgePrefs preferences();
 }
