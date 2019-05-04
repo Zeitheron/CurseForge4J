@@ -1,16 +1,18 @@
 package com.zeitheron.curseforge.data;
 
-import com.zeitheron.curseforge.ICurseForge;
-import com.zeitheron.curseforge.IMember;
-import com.zeitheron.curseforge.fetcher.Fetchable;
+import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.IMember;
+import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
 
-public class ProjectMember
+public class FetchableMember
 {
 	protected final String name, role;
+	@Ignore
 	protected final ICurseForge cf;
+	@Ignore
 	protected final Fetchable<IMember> member;
 	
-	public ProjectMember(String name, String role, ICurseForge cf)
+	public FetchableMember(String name, String role, ICurseForge cf)
 	{
 		this.name = name;
 		this.role = role;
@@ -18,7 +20,7 @@ public class ProjectMember
 		this.member = cf.member(this.name);
 	}
 	
-	public Fetchable<IMember> asMember()
+	public Fetchable<IMember> fetch()
 	{
 		return member;
 	}
@@ -36,6 +38,6 @@ public class ProjectMember
 	@Override
 	public String toString()
 	{
-		return name + " - " + role;
+		return ToStringHelper.toString(this);
 	}
 }

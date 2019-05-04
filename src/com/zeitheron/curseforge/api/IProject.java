@@ -1,10 +1,10 @@
-package com.zeitheron.curseforge;
+package com.zeitheron.curseforge.api;
 
 import java.util.Date;
 import java.util.List;
 
 import com.zeitheron.curseforge.data.ProjectFiles;
-import com.zeitheron.curseforge.data.ProjectMember;
+import com.zeitheron.curseforge.data.FetchableMember;
 
 public interface IProject
 {
@@ -26,13 +26,15 @@ public interface IProject
 	
 	long projectId();
 	
-	List<ProjectMember> membersList();
+	List<FetchableMember> membersList();
 	
-	ProjectMember[] membersArray();
+	FetchableMember[] membersArray();
 	
 	ProjectFiles files();
 	
 	String url();
+	
+	String category();
 	
 	ICurseForge curseForge();
 }

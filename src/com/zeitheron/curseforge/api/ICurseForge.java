@@ -1,12 +1,14 @@
-package com.zeitheron.curseforge;
+package com.zeitheron.curseforge.api;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import com.zeitheron.curseforge.CurseforgeAPI;
 import com.zeitheron.curseforge.data.CurseForgePrefs;
-import com.zeitheron.curseforge.fetcher.Fetchable;
+import com.zeitheron.curseforge.data.Fetchable;
+import com.zeitheron.curseforge.data.FetchableProject;
 
 public interface ICurseForge
 {
@@ -20,6 +22,10 @@ public interface ICurseForge
 	Fetchable<IMember> member(String member);
 	
 	String game();
+	
+	CurseForgePrefs preferences();
+	
+	ISearchResult<FetchableProject> searchProjects(String query);
 	
 	static String getPage(String url, boolean format)
 	{
@@ -50,6 +56,4 @@ public interface ICurseForge
 			return CurseforgeAPI.$ets(e);
 		}
 	}
-	
-	CurseForgePrefs preferences();
 }

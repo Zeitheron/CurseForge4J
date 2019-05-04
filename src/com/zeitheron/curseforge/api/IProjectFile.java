@@ -1,10 +1,10 @@
-package com.zeitheron.curseforge;
+package com.zeitheron.curseforge.api;
 
 import java.util.Date;
 import java.util.List;
 
 import com.zeitheron.curseforge.data.FetchableFile;
-import com.zeitheron.curseforge.data.ProjectMember;
+import com.zeitheron.curseforge.data.FetchableMember;
 
 public interface IProjectFile
 {
@@ -24,7 +24,7 @@ public interface IProjectFile
 	
 	List<FetchableFile> additionalFiles();
 	
-	ProjectMember uploader();
+	FetchableMember uploader();
 	
 	String url();
 	

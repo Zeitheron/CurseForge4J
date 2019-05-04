@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.zeitheron.curseforge.ICurseForge;
-import com.zeitheron.curseforge.IProject;
-import com.zeitheron.curseforge.fetcher.Fetchable;
+import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.IProject;
+import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
 
 public class ProjectFilePage
 {
 	protected final IProject project;
 	protected final int page;
+	@Ignore
 	protected final Fetchable<List<FetchableFile>> files;
 	
 	ProjectFilePage(IProject project, int page)
@@ -55,5 +56,11 @@ public class ProjectFilePage
 	public IProject project()
 	{
 		return project;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return ToStringHelper.toString(this);
 	}
 }

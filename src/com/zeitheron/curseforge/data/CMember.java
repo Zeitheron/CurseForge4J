@@ -1,29 +1,29 @@
-package com.zeitheron.curseforge.base;
+package com.zeitheron.curseforge.data;
 
 import java.util.Date;
 import java.util.List;
 import java.util.function.Supplier;
 
-import com.zeitheron.curseforge.ICurseForge;
-import com.zeitheron.curseforge.IMember;
-import com.zeitheron.curseforge.data.MemberPosts;
-import com.zeitheron.curseforge.data.MemberThanks;
-import com.zeitheron.curseforge.data.MembersProject;
-import com.zeitheron.curseforge.fetcher.Fetchable;
+import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.IMember;
+import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
 
-public class BaseMember implements IMember
+public class CMember implements IMember
 {
 	protected final Date register, lastActive;
 	protected final String avatar, name;
 	protected final MemberPosts posts;
 	protected final MemberThanks thanks;
 	protected final long followers;
-	protected final Fetchable<List<MembersProject>> projects;
+	@Ignore
+	protected final Fetchable<List<FetchableProject>> projects;
+	@Ignore
 	protected final Fetchable<List<String>> followerList;
+	@Ignore
 	protected final ICurseForge cf;
 	protected final String url;
 	
-	public BaseMember(Date register, Date lastActive, String avatar, String name, MemberPosts posts, MemberThanks thanks, long followers, Supplier<List<MembersProject>> projects, ICurseForge cf, String url, Supplier<List<String>> followerList)
+	public CMember(Date register, Date lastActive, String avatar, String name, MemberPosts posts, MemberThanks thanks, long followers, Supplier<List<FetchableProject>> projects, ICurseForge cf, String url, Supplier<List<String>> followerList)
 	{
 		this.register = register;
 		this.lastActive = lastActive;
@@ -81,11 +81,11 @@ public class BaseMember implements IMember
 	}
 	
 	@Override
-	public List<MembersProject> projects()
+	public List<FetchableProject> projects()
 	{
 		return projects.get();
 	}
-
+	
 	@Override
 	public ICurseForge curseForge()
 	{
@@ -97,13 +97,13 @@ public class BaseMember implements IMember
 	{
 		return url;
 	}
-
+	
 	@Override
 	public List<String> followerList()
 	{
 		return followerList.get();
 	}
-
+	
 	@Override
 	public String avatarURL(int size)
 	{
@@ -113,5 +113,11 @@ public class BaseMember implements IMember
 		else
 			url += "?size=" + size;
 		return url;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return ToStringHelper.toString(this);
 	}
 }

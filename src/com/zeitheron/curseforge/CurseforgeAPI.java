@@ -8,8 +8,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.zeitheron.curseforge.base.GenericCurseforge;
+import com.zeitheron.curseforge.api.ICurseForge;
 import com.zeitheron.curseforge.data.CurseForgePrefs;
+import com.zeitheron.curseforge.data.GenericCurseforge;
 
 public class CurseforgeAPI
 {

@@ -1,16 +1,18 @@
 package com.zeitheron.curseforge.data;
 
-import com.zeitheron.curseforge.ICurseForge;
-import com.zeitheron.curseforge.IProject;
-import com.zeitheron.curseforge.fetcher.Fetchable;
+import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.IProject;
+import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
 
-public class MembersProject
+public class FetchableProject
 {
 	protected final String name, slug;
+	@Ignore
 	protected final ICurseForge cf;
+	@Ignore
 	protected final Fetchable<IProject> project;
 	
-	public MembersProject(String name, String slug, ICurseForge cf)
+	public FetchableProject(String name, String slug, ICurseForge cf)
 	{
 		this.name = name;
 		this.slug = slug;
@@ -18,7 +20,7 @@ public class MembersProject
 		this.project = cf.project(slug);
 	}
 	
-	public Fetchable<IProject> asProject()
+	public Fetchable<IProject> fetch()
 	{
 		return project;
 	}
@@ -36,6 +38,6 @@ public class MembersProject
 	@Override
 	public String toString()
 	{
-		return name + " (" + slug + ")";
+		return ToStringHelper.toString(this);
 	}
 }

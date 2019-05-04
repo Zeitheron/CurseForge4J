@@ -1,4 +1,4 @@
-package com.zeitheron.curseforge.base;
+package com.zeitheron.curseforge.data;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,15 +13,10 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import com.zeitheron.curseforge.CurseforgeAPI;
-import com.zeitheron.curseforge.ICurseForge;
-import com.zeitheron.curseforge.IMember;
-import com.zeitheron.curseforge.IProject;
-import com.zeitheron.curseforge.data.CurseForgePrefs;
-import com.zeitheron.curseforge.data.MemberPosts;
-import com.zeitheron.curseforge.data.MemberThanks;
-import com.zeitheron.curseforge.data.MembersProject;
-import com.zeitheron.curseforge.data.ProjectMember;
-import com.zeitheron.curseforge.fetcher.Fetchable;
+import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.IMember;
+import com.zeitheron.curseforge.api.IProject;
+import com.zeitheron.curseforge.api.ISearchResult;
 
 public class GenericCurseforge implements ICurseForge
 {
@@ -84,7 +79,7 @@ public class GenericCurseforge implements ICurseForge
 				Date lastUpdate = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Last Released File</div><div class=\"info-data\"><abbr", "</abbr>"));
 				long totalDownloads = Long.parseLong(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Total Downloads</div><div class=\"info-data\">", "</div>").replaceAll(",", ""));
 				
-				List<ProjectMember> members = new ArrayList<>();
+				List<FetchableMember> members = new ArrayList<>();
 				{
 					String rawMembers = CurseforgeAPI.$cptr(page, "<div class=\"cf-sidebar-inner\"><ul class=\"cf-details project-members\">", "</ul></div>");
 					String[] mba = rawMembers.split("<li class=");
@@ -94,11 +89,13 @@ public class GenericCurseforge implements ICurseForge
 						String mbn = CurseforgeAPI.$cptr(mbr, "<span>", "</span>");
 						String mbk = CurseforgeAPI.$cptr(mbr, "<span class=\"title\">", "</span>");
 						if(mbn != null && mbk != null)
-							members.add(new ProjectMember(mbn, mbk, this));
+							members.add(new FetchableMember(mbn, mbk, this));
 					}
-				}
+				};
 				
-				return new BaseProject(name, overview, CurseforgeAPI.$rlnk(desc), avatar, thumbnail, created, lastUpdate, projectId, totalDownloads, members, this, url);
+				String rootGameCategory = CurseforgeAPI.$cptr(CurseforgeAPI.$cptr(page, "\"RootGameCategory\">", "</h2>"), "href=\"/", "\">");
+				
+				return new CProject(name, overview, CurseforgeAPI.$rlnk(desc), avatar, thumbnail, created, lastUpdate, projectId, totalDownloads, members, this, url, rootGameCategory);
 			}, preferences().getCacheLifespan().getVal(), preferences().getCacheLifespan().getUnit()));
 		return projectCache.get(project.toLowerCase());
 	}
@@ -150,9 +147,9 @@ public class GenericCurseforge implements ICurseForge
 				long th_rcv = Long.parseLong(likeMeta$[0].split(" ")[0].substring(1));
 				long th_gvn = Long.parseLong(likeMeta$[1].split(" ")[0]);
 				
-				Supplier<List<MembersProject>> projects = () ->
+				Supplier<List<FetchableProject>> projects = () ->
 				{
-					List<MembersProject> prs = new ArrayList<>();
+					List<FetchableProject> prs = new ArrayList<>();
 					List<String> ids = new ArrayList<>();
 					int i = 1;
 					while(true)
@@ -169,7 +166,7 @@ public class GenericCurseforge implements ICurseForge
 									if(!ids.contains(pr))
 									{
 										ids.add(pr);
-										prs.add(new MembersProject(v.substring(e + 2, v.indexOf("</a>")), pr, this));
+										prs.add(new FetchableProject(v.substring(e + 2, v.indexOf("</a>")), pr, this));
 										++added;
 									}
 								}
@@ -191,7 +188,7 @@ public class GenericCurseforge implements ICurseForge
 					return Collections.unmodifiableList(new ArrayList<>(located));
 				};
 				
-				return new BaseMember(registerDate, lastActive, avatar, name, new MemberPosts(comments, forumPosts), new MemberThanks(th_gvn, th_rcv), followers, projects, this, base, followerList);
+				return new CMember(registerDate, lastActive, avatar, name, new MemberPosts(comments, forumPosts), new MemberThanks(th_gvn, th_rcv), followers, projects, this, base, followerList);
 			}, preferences().getCacheLifespan().getVal(), preferences().getCacheLifespan().getUnit()));
 		return memberCache.get(member.toLowerCase());
 	}
@@ -206,5 +203,11 @@ public class GenericCurseforge implements ICurseForge
 	public CurseForgePrefs preferences()
 	{
 		return prefs;
+	}
+
+	@Override
+	public ISearchResult<FetchableProject> searchProjects(String query)
+	{
+		return new ProjectSearchResult(this, 1, query);
 	}
 }

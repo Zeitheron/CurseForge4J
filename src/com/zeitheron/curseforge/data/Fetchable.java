@@ -1,4 +1,4 @@
-package com.zeitheron.curseforge.fetcher;
+package com.zeitheron.curseforge.data;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

@@ -1,13 +1,14 @@
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.zeitheron.curseforge.CurseforgeAPI;
-import com.zeitheron.curseforge.ICurseForge;
-import com.zeitheron.curseforge.IMember;
-import com.zeitheron.curseforge.IProject;
-import com.zeitheron.curseforge.IProjectFile;
+import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.IMember;
+import com.zeitheron.curseforge.api.IProject;
+import com.zeitheron.curseforge.api.IProjectFile;
 import com.zeitheron.curseforge.data.CurseForgePrefs;
 import com.zeitheron.curseforge.data.FetchableFile;
-import com.zeitheron.curseforge.data.MembersProject;
+import com.zeitheron.curseforge.data.FetchableProject;
 import com.zeitheron.curseforge.data.TimeHolder;
 
 public class TestCF
@@ -17,6 +18,9 @@ public class TestCF
 		CurseForgePrefs prefs = new CurseForgePrefs();
 		prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
 		ICurseForge mc = CurseforgeAPI.minecraft(prefs);
+		
+		// Test Search
+		testSearch(mc);
 		
 		// Print newest version of Hammer Lib
 		testFileList(mc);
@@ -36,9 +40,19 @@ public class TestCF
 		test(mc);
 	}
 	
+	public static void testSearch(ICurseForge mc)
+	{
+		String query = "Always Online";
+		System.out.println("Searching for \"" + query + "\"");
+		List<FetchableProject> fps = mc.searchProjects(query).getElements();
+		System.out.println("Found " + fps.size() + " elements (page 1):");
+		for(FetchableProject fp : fps)
+			System.out.println(" - " + fp);
+	}
+	
 	public static void testFileList(ICurseForge mc)
 	{
-		IProject project = mc.project("hammer-lib").get();
+		IProject project = mc.project("295721").get();
 		
 		System.out.println("Name: " + project.name() + "; Overview: " + project.overview());
 		System.out.println("Description (HTML): " + project.description());
@@ -56,7 +70,7 @@ public class TestCF
 		IProjectFile latest = project //
 		        .files() //
 		        .latest() //
-		        .asProjectFile() //
+		        .fetch() //
 		        .get();
 		
 		System.out.println("Latest:");
@@ -79,7 +93,7 @@ public class TestCF
 			for(FetchableFile add : file.additionalFiles())
 			{
 				System.out.println(prefix + "  " + add.id() + ":");
-				printFileInfo(add.asProjectFile().fetchNow(), prefix + "    ");
+				printFileInfo(add.fetch().fetchNow(), prefix + "    ");
 			}
 		}
 	}
@@ -91,13 +105,13 @@ public class TestCF
 		System.out.println("Name: " + member.name());
 		System.out.println("Registered @: " + member.registerDate());
 		System.out.println("Last active: " + member.lastActive());
-		System.out.println("Followers: " + member.followers());
+		System.out.println("Followers: " + member.followers() + " " + member.followerList());
 		System.out.println("Posts: " + member.posts().total() + " Total - " + member.posts().comments() + " comments, " + member.posts().forumPosts() + " forum posts.");
 		System.out.println("Thanks: " + member.thanks().total() + " Total - " + member.thanks().received() + " received, " + member.thanks().given() + " given.");
 		System.out.println("Projects: " + member.projects().size());
 		
 		int i = 0;
-		for(MembersProject proj : member.projects())
+		for(FetchableProject proj : member.projects())
 		{
 			System.out.println("- " + proj);
 			++i;
@@ -112,9 +126,10 @@ public class TestCF
 		System.out.println("------------------------------------------");
 		System.out.println();
 		
-		IProject project = member.projects().get(0).asProject().get();
+		IProject project = member.projects().get(0).fetch().get();
 		
+		System.out.println("Newest updated project: " + project);
 		System.out.println("Latest:");
-		printFileInfo(project.files().latest().asProjectFile().get(), "  ");
+		printFileInfo(project.files().latest().fetch().get(), "  ");
 	}
 }

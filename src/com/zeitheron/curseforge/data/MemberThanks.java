@@ -25,4 +25,10 @@ public class MemberThanks
 	{
 		return received;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return ToStringHelper.toString(this);
+	}
 }

@@ -1,4 +1,4 @@
-package com.zeitheron.curseforge.base;
+package com.zeitheron.curseforge.data;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -8,13 +8,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.zeitheron.curseforge.CurseforgeAPI;
-import com.zeitheron.curseforge.ICurseForge;
-import com.zeitheron.curseforge.IProject;
-import com.zeitheron.curseforge.IProjectFile;
-import com.zeitheron.curseforge.data.FetchableFile;
-import com.zeitheron.curseforge.data.ProjectMember;
+import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.IProject;
+import com.zeitheron.curseforge.api.IProjectFile;
 
-public class BaseFile implements IProjectFile
+public class CFile implements IProjectFile
 {
 	private static final Map<String, Long> bytes = new HashMap<>();
 	static
@@ -30,11 +28,11 @@ public class BaseFile implements IProjectFile
 	protected final Date uploaded;
 	protected final long downloads, sizel;
 	protected final List<FetchableFile> additionalFiles;
-	protected final ProjectMember uploader;
+	protected final FetchableMember uploader;
 	protected final String changelog;
 	protected final String size;
 	
-	public BaseFile(IProject project, String id, String displayName, String fileName, String md5, Date uploaded, long downloads, List<String> additionalFiles, ProjectMember uploader, String changelog, String size)
+	public CFile(IProject project, String id, String displayName, String fileName, String md5, Date uploaded, long downloads, List<String> additionalFiles, FetchableMember uploader, String changelog, String size)
 	{
 		this.project = project;
 		this.id = id;
@@ -106,7 +104,7 @@ public class BaseFile implements IProjectFile
 	}
 	
 	@Override
-	public ProjectMember uploader()
+	public FetchableMember uploader()
 	{
 		return uploader;
 	}
@@ -125,10 +123,10 @@ public class BaseFile implements IProjectFile
 		String displayName = CurseforgeAPI.$cptr(page, "<h3 class=\"overflow-tip\">", "</h3>");
 		String fileName = CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Filename</div><div class=\"info-data overflow-tip\">", "</div>");
 		
-		ProjectMember uploader = null;
+		FetchableMember uploader = null;
 		{
 			String userTag = CurseforgeAPI.$cptr(page, "<div class=\"user-tag\">", "</a></div>");
-			for(ProjectMember pm : proj.membersList())
+			for(FetchableMember pm : proj.membersList())
 				if(userTag.contains(pm.name()))
 				{
 					uploader = pm;
@@ -157,7 +155,7 @@ public class BaseFile implements IProjectFile
 		String changelog = CurseforgeAPI.$rlnk(CurseforgeAPI.$cptr(page, "<div class=\"logbox\">", "</div></section>"));
 		String size = CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Size</div><div class=\"info-data\">", "</div>");
 		
-		return new BaseFile(proj, id, displayName, fileName, md5, uploaded, downloads, fis, uploader, changelog, size);
+		return new CFile(proj, id, displayName, fileName, md5, uploaded, downloads, fis, uploader, changelog, size);
 	}
 
 	@Override

@@ -3,14 +3,16 @@ package com.zeitheron.curseforge.data;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.zeitheron.curseforge.ICurseForge;
-import com.zeitheron.curseforge.IProject;
-import com.zeitheron.curseforge.fetcher.Fetchable;
+import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.IProject;
+import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
 
 public class ProjectFiles
 {
 	protected final IProject project;
+	@Ignore
 	protected final Fetchable<String> firstPage;
+	@Ignore
 	protected final Fetchable<Integer> pageCount;
 	private final Map<Integer, ProjectFilePage> pages = new HashMap<>();
 	
@@ -63,5 +65,11 @@ public class ProjectFiles
 	public IProject project()
 	{
 		return project;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return ToStringHelper.toString(this);
 	}
 }

@@ -1,11 +1,11 @@
-package com.zeitheron.curseforge;
+package com.zeitheron.curseforge.api;
 
 import java.util.Date;
 import java.util.List;
 
 import com.zeitheron.curseforge.data.MemberPosts;
 import com.zeitheron.curseforge.data.MemberThanks;
-import com.zeitheron.curseforge.data.MembersProject;
+import com.zeitheron.curseforge.data.FetchableProject;
 
 public interface IMember
 {
@@ -23,7 +23,7 @@ public interface IMember
 	
 	MemberPosts posts();
 	
-	List<MembersProject> projects();
+	List<FetchableProject> projects();
 	
 	List<String> followerList();
 	

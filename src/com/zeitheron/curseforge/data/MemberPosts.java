@@ -25,4 +25,10 @@ public class MemberPosts
 	{
 		return forumPosts;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return ToStringHelper.toString(this);
+	}
 }

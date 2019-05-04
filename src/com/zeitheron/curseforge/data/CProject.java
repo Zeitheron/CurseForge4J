@@ -1,28 +1,31 @@
-package com.zeitheron.curseforge.base;
+package com.zeitheron.curseforge.data;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import com.zeitheron.curseforge.ICurseForge;
-import com.zeitheron.curseforge.IProject;
-import com.zeitheron.curseforge.data.ProjectFiles;
-import com.zeitheron.curseforge.data.ProjectMember;
+import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.IProject;
+import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
 
-public class BaseProject implements IProject
+public class CProject implements IProject
 {
-	protected final String name, overview, desc, avatar, thumb;
+	protected final String name, overview, avatar, thumb;
 	protected final Date create, update;
 	protected final long id, downloads;
-	
+	@Ignore
 	protected final ICurseForge cf;
-	protected final List<ProjectMember> membersList;
-	protected final ProjectMember[] membersArray;
-	
+	protected final List<FetchableMember> membersList;
+	@Ignore
+	protected final FetchableMember[] membersArray;
+	@Ignore
 	protected final ProjectFiles files;
 	protected final String url;
+	protected final String gameCategory;
+	@Ignore
+	protected final String desc;
 	
-	public BaseProject(String name, String overview, String desc, String avatar, String thumb, Date create, Date update, long id, long downloads, List<ProjectMember> members, ICurseForge cf, String url)
+	public CProject(String name, String overview, String desc, String avatar, String thumb, Date create, Date update, long id, long downloads, List<FetchableMember> members, ICurseForge cf, String url, String gameCategory)
 	{
 		this.name = name;
 		this.overview = overview;
@@ -34,10 +37,11 @@ public class BaseProject implements IProject
 		this.id = id;
 		this.downloads = downloads;
 		this.membersList = Collections.unmodifiableList(members);
-		this.membersArray = members.toArray(new ProjectMember[members.size()]);
+		this.membersArray = members.toArray(new FetchableMember[members.size()]);
 		this.cf = cf;
 		this.url = url;
 		this.files = new ProjectFiles(this);
+		this.gameCategory = gameCategory;
 	}
 	
 	@Override
@@ -95,13 +99,13 @@ public class BaseProject implements IProject
 	}
 	
 	@Override
-	public List<ProjectMember> membersList()
+	public List<FetchableMember> membersList()
 	{
 		return membersList;
 	}
 	
 	@Override
-	public ProjectMember[] membersArray()
+	public FetchableMember[] membersArray()
 	{
 		return membersArray.clone();
 	}
@@ -117,10 +121,22 @@ public class BaseProject implements IProject
 	{
 		return files;
 	}
-
+	
 	@Override
 	public String url()
 	{
 		return url;
+	}
+	
+	@Override
+	public String category()
+	{
+		return gameCategory;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return ToStringHelper.toString(this);
 	}
 }
