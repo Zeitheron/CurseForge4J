@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import com.zeitheron.curseforge.CurseforgeAPI;
@@ -180,7 +182,16 @@ public class GenericCurseforge implements ICurseForge
 					return Collections.unmodifiableList(prs);
 				};
 				
-				return new BaseMember(registerDate, lastActive, avatar, name, new MemberPosts(comments, forumPosts), new MemberThanks(th_gvn, th_rcv), followers, projects, this, base);
+				Supplier<List<String>> followerList = () ->
+				{
+					String txt = ICurseForge.getPage(base + "/followers", true);
+					Set<String> located = new HashSet<>(CurseforgeAPI.$cptrs(txt, "<a href=\"/members/", "\""));
+					located.removeIf(s -> s.contains("/"));
+					located.remove(member);
+					return Collections.unmodifiableList(new ArrayList<>(located));
+				};
+				
+				return new BaseMember(registerDate, lastActive, avatar, name, new MemberPosts(comments, forumPosts), new MemberThanks(th_gvn, th_rcv), followers, projects, this, base, followerList);
 			}, preferences().getCacheLifespan().getVal(), preferences().getCacheLifespan().getUnit()));
 		return memberCache.get(member.toLowerCase());
 	}
@@ -190,7 +201,7 @@ public class GenericCurseforge implements ICurseForge
 	{
 		return game;
 	}
-
+	
 	@Override
 	public CurseForgePrefs preferences()
 	{

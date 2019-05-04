@@ -19,10 +19,11 @@ public class BaseMember implements IMember
 	protected final MemberThanks thanks;
 	protected final long followers;
 	protected final Fetchable<List<MembersProject>> projects;
+	protected final Fetchable<List<String>> followerList;
 	protected final ICurseForge cf;
 	protected final String url;
 	
-	public BaseMember(Date register, Date lastActive, String avatar, String name, MemberPosts posts, MemberThanks thanks, long followers, Supplier<List<MembersProject>> projects, ICurseForge cf, String url)
+	public BaseMember(Date register, Date lastActive, String avatar, String name, MemberPosts posts, MemberThanks thanks, long followers, Supplier<List<MembersProject>> projects, ICurseForge cf, String url, Supplier<List<String>> followerList)
 	{
 		this.register = register;
 		this.lastActive = lastActive;
@@ -32,6 +33,7 @@ public class BaseMember implements IMember
 		this.thanks = thanks;
 		this.followers = followers;
 		this.projects = new Fetchable<>(projects, cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
+		this.followerList = new Fetchable<List<String>>(followerList, cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
 		this.cf = cf;
 		this.url = url;
 	}
@@ -93,6 +95,23 @@ public class BaseMember implements IMember
 	@Override
 	public String url()
 	{
+		return url;
+	}
+
+	@Override
+	public List<String> followerList()
+	{
+		return followerList.get();
+	}
+
+	@Override
+	public String avatarURL(int size)
+	{
+		String url = avatarURL();
+		if(url.contains("?"))
+			url += "&size=" + size;
+		else
+			url += "?size=" + size;
 		return url;
 	}
 }

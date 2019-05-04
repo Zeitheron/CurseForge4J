@@ -13,6 +13,8 @@ public interface IMember
 	
 	String avatarURL();
 	
+	String avatarURL(int size);
+	
 	Date lastActive();
 	
 	String name();
@@ -22,6 +24,8 @@ public interface IMember
 	MemberPosts posts();
 	
 	List<MembersProject> projects();
+	
+	List<String> followerList();
 	
 	long followers();
 	
