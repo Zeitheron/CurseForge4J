@@ -42,7 +42,7 @@ public class TestCF
 	
 	public static void testSearch(ICurseForge mc)
 	{
-		String query = "Always Online";
+		String query = "Solar Flux";
 		System.out.println("Searching for \"" + query + "\"");
 		List<FetchableProject> fps = mc.searchProjects(query).getElements();
 		System.out.println("Found " + fps.size() + " elements (page 1):");
@@ -60,6 +60,7 @@ public class TestCF
 		System.out.println("Total downloads: " + String.format("%,d", project.totalDownloads()));
 		System.out.println("Last updated: " + project.lastUpdate());
 		System.out.println("Created @: " + project.createTime());
+		System.out.println("Type: " + project.category());
 		System.out.println("Members: " + project.membersList());
 		
 		System.out.println();
