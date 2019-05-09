@@ -26,7 +26,7 @@ public class ProjectSearchResult implements ISearchResult<FetchableProject>
 		this.cf = cf;
 		this.query = query;
 		this.page = page;
-		this.projects = new Fetchable<>(generator(cf, page, query), cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
+		this.projects = cf.createFetchable(generator(cf, page, query));
 		setInheritance(new HashMap<>());
 	}
 	
@@ -35,7 +35,7 @@ public class ProjectSearchResult implements ISearchResult<FetchableProject>
 		this.cf = cf;
 		this.query = query;
 		this.page = page;
-		this.projects = new Fetchable<>(generator(cf, page, query), cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
+		this.projects = cf.createFetchable(generator(cf, page, query));
 		setInheritance(inheritance);
 	}
 	

@@ -32,8 +32,8 @@ public class CMember implements IMember
 		this.posts = posts;
 		this.thanks = thanks;
 		this.followers = followers;
-		this.projects = new Fetchable<>(projects, cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
-		this.followerList = new Fetchable<List<String>>(followerList, cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
+		this.projects = cf.createFetchable(projects);
+		this.followerList = cf.createFetchable(followerList);
 		this.cf = cf;
 		this.url = url;
 	}

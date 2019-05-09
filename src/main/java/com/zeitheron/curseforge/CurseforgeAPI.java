@@ -14,6 +14,19 @@ import com.zeitheron.curseforge.data.GenericCurseforge;
 
 public class CurseforgeAPI
 {
+	public static final String API_VERSION = version();
+	public static final String CATEGORY_MC_MODPACKS = "modpacks";
+	public static final String CATEGORY_MC_CUSTOMIZATION = "customization";
+	public static final String CATEGORY_MC_ADDONS = "mc-addons";
+	public static final String CATEGORY_MC_MODS = "mc-mods";
+	public static final String CATEGORY_MC_TEXTURE_PACKS = "texture-packs";
+	public static final String CATEGORY_MC_WORLDS = "worlds";
+	
+	public static String version()
+	{
+		return "v1.3";
+	}
+	
 	public static ICurseForge minecraft()
 	{
 		return $.create(GenericCurseforge.class, "minecraft");

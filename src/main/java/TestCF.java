@@ -2,10 +2,13 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.zeitheron.curseforge.CurseforgeAPI;
+import com.zeitheron.curseforge.api.EnumSortRule;
 import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.IGameVersion;
 import com.zeitheron.curseforge.api.IMember;
 import com.zeitheron.curseforge.api.IProject;
 import com.zeitheron.curseforge.api.IProjectFile;
+import com.zeitheron.curseforge.api.IProjectList;
 import com.zeitheron.curseforge.data.CurseForgePrefs;
 import com.zeitheron.curseforge.data.FetchableFile;
 import com.zeitheron.curseforge.data.FetchableProject;
@@ -19,6 +22,9 @@ public class TestCF
 		prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
 		ICurseForge mc = CurseforgeAPI.minecraft(prefs);
 		
+		// Test Project List
+		testProjectList(mc);
+		
 		// Test Search
 		testSearch(mc);
 		
@@ -31,13 +37,18 @@ public class TestCF
 		// Run first iteration - it is going to be slow, since we cache
 		// everything
 		test(mc);
+	}
+	
+	public static void testProjectList(ICurseForge mc)
+	{
+		IGameVersion ver = mc.gameVersions().get().stream().filter(v -> v.displayName().equals("1.13.2")).findFirst().orElse(null);
 		
-		for(int i = 0; i < 8; ++i)
-			System.out.println();
-			
-		// Run second iteration - it's very fast, since eveything is already
-		// cached.
-		test(mc);
+		IProjectList list = mc.listCategory(CurseforgeAPI.CATEGORY_MC_MODS, EnumSortRule.LAST_UPDATED, ver);
+		
+		System.out.println("First page of last updates mods:");
+		for(FetchableProject fp : list.projects().get())
+			System.out.println(" - " + fp.name());
+		System.out.println("-------------------------------");
 	}
 	
 	public static void testSearch(ICurseForge mc)
@@ -52,7 +63,18 @@ public class TestCF
 	
 	public static void testFileList(ICurseForge mc)
 	{
-		IProject project = mc.project("295721").get();
+		IProject project = mc.project("hammer-lib").get();
+		
+		System.out.println("Listing all files...");
+		for(int page = 1; page <= project.files().pageCount(); ++page)
+		{
+			System.out.println("Page " + page);
+			List<FetchableFile> ffs = project.files().page(page).files().get();
+			if(ffs.isEmpty())
+				break;
+			for(FetchableFile ff : ffs)
+				System.out.println(" -" + ff.fetch().get().displayName());
+		}
 		
 		System.out.println("Name: " + project.name() + "; Overview: " + project.overview());
 		System.out.println("Description (HTML): " + project.description());

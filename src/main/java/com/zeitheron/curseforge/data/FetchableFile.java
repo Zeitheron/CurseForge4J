@@ -1,6 +1,5 @@
 package com.zeitheron.curseforge.data;
 
-import com.zeitheron.curseforge.api.ICurseForge;
 import com.zeitheron.curseforge.api.IProject;
 import com.zeitheron.curseforge.api.IProjectFile;
 import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
@@ -16,8 +15,7 @@ public class FetchableFile
 	{
 		this.project = project;
 		this.id = id;
-		ICurseForge cf = project.curseForge();
-		this.file = new Fetchable<>(() -> CFile.create(project, id), cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
+		this.file = project.curseForge().createFetchable(() -> CFile.create(project, id));
 	}
 	
 	public Fetchable<IProjectFile> fetch()

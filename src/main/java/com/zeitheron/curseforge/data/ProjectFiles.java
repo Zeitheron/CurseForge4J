@@ -20,8 +20,8 @@ public class ProjectFiles
 	{
 		this.project = project;
 		ICurseForge cf = project.curseForge();
-		this.firstPage = new Fetchable<>(() -> ICurseForge.getPage(project.url() + "/files", true), cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
-		this.pageCount = new Fetchable<>(() ->
+		this.firstPage = cf.createFetchable(() -> ICurseForge.getPage(project.url() + "/files", true));
+		this.pageCount = cf.createFetchable(() ->
 		{
 			int mp = 0;
 			String str = this.firstPage.get();
@@ -36,7 +36,7 @@ public class ProjectFiles
 			if(mp == 0 && hasFile)
 				return 1;
 			return mp;
-		}, cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
+		});
 	}
 	
 	public int pageCount()

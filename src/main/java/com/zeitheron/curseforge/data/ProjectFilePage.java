@@ -20,7 +20,7 @@ public class ProjectFilePage
 		this.project = project;
 		this.page = page;
 		ICurseForge cf = project.curseForge();
-		this.files = new Fetchable<>(() ->
+		this.files = cf.createFetchable(() ->
 		{
 			String pg;
 			if(page == 1)
@@ -35,12 +35,12 @@ public class ProjectFilePage
 			{
 				pg = pg.substring(i + 7);
 				String fi = pg.substring(0, pg.indexOf('"'));
-				if(!fi.equals("latest") && !fi.contains("download") && !fis.contains(fi))
+				if(!fi.equals("latest") && !fi.contains("download") && !fi.contains("#") && !fis.contains(fi))
 					fis.add(fi);
 			}
 			
 			return fis.stream().map(fi -> new FetchableFile(project, fi)).collect(Collectors.toList());
-		}, cf.preferences().getCacheLifespan().getVal(), cf.preferences().getCacheLifespan().getUnit());
+		});
 	}
 	
 	public Fetchable<List<FetchableFile>> files()

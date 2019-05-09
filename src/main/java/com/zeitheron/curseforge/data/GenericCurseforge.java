@@ -13,23 +13,26 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import com.zeitheron.curseforge.CurseforgeAPI;
+import com.zeitheron.curseforge.api.EnumSortRule;
 import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.IGameVersion;
 import com.zeitheron.curseforge.api.IMember;
 import com.zeitheron.curseforge.api.IProject;
+import com.zeitheron.curseforge.api.IProjectList;
 import com.zeitheron.curseforge.api.ISearchResult;
 
 public class GenericCurseforge implements ICurseForge
 {
-	private static final SimpleDateFormat SDF1 = new SimpleDateFormat("MM/dd/yyyy");
+	static final SimpleDateFormat SDF1 = new SimpleDateFormat("MM/dd/yyyy");
+	final String game;
+	final CurseForgePrefs prefs = new CurseForgePrefs();
+	final Map<String, Fetchable<IProject>> projectCache = new HashMap<>();
+	final Map<String, Fetchable<IMember>> memberCache = new HashMap<>();
+	final DefaultableMap<String, HashMap<Integer, GenericProjectList>> listStorage = new DefaultableMap<>(s -> new HashMap<>());
+	Fetchable<List<String>> rootCats;
+	Fetchable<List<IGameVersion>> gameVersions;
 	
-	protected final String game;
-	
-	private final CurseForgePrefs prefs = new CurseForgePrefs();
-	
-	private final Map<String, Fetchable<IProject>> projectCache = new HashMap<>();
-	private final Map<String, Fetchable<IMember>> memberCache = new HashMap<>();
-	
-	protected GenericCurseforge(String game)
+	GenericCurseforge(String game)
 	{
 		this.game = game;
 	}
@@ -38,9 +41,9 @@ public class GenericCurseforge implements ICurseForge
 	public Fetchable<IProject> project(String project)
 	{
 		if(!projectCache.containsKey(project.toLowerCase()))
-			projectCache.put(project.toLowerCase(), new Fetchable<>(() ->
+			projectCache.put(project.toLowerCase(), createFetchable(() ->
 			{
-				String url = CurseforgeAPI.$cfidg(game()) + "projects/" + project;
+				String url = url() + "projects/" + project;
 				
 				String page = ICurseForge.getPage(url, true);
 				
@@ -91,12 +94,13 @@ public class GenericCurseforge implements ICurseForge
 						if(mbn != null && mbk != null)
 							members.add(new FetchableMember(mbn, mbk, this));
 					}
-				};
+				}
+				;
 				
 				String rootGameCategory = CurseforgeAPI.$cptr(CurseforgeAPI.$cptr(page, "\"RootGameCategory\">", "</h2>"), "href=\"/", "\">");
 				
 				return new CProject(name, overview, CurseforgeAPI.$rlnk(desc), avatar, thumbnail, created, lastUpdate, projectId, totalDownloads, members, this, url, rootGameCategory);
-			}, preferences().getCacheLifespan().getVal(), preferences().getCacheLifespan().getUnit()));
+			}));
 		return projectCache.get(project.toLowerCase());
 	}
 	
@@ -104,9 +108,9 @@ public class GenericCurseforge implements ICurseForge
 	public Fetchable<IMember> member(String member)
 	{
 		if(!memberCache.containsKey(member.toLowerCase()))
-			memberCache.put(member.toLowerCase(), new Fetchable<>(() ->
+			memberCache.put(member.toLowerCase(), createFetchable(() ->
 			{
-				String base = CurseforgeAPI.$cfidg(game()) + "members/" + member;
+				String base = url() + "members/" + member;
 				String page = ICurseForge.getPage(base, true);
 				
 				String name = CurseforgeAPI.$cptr(page, "<li class=\"username\">", "</li>");
@@ -189,7 +193,7 @@ public class GenericCurseforge implements ICurseForge
 				};
 				
 				return new CMember(registerDate, lastActive, avatar, name, new MemberPosts(comments, forumPosts), new MemberThanks(th_gvn, th_rcv), followers, projects, this, base, followerList);
-			}, preferences().getCacheLifespan().getVal(), preferences().getCacheLifespan().getUnit()));
+			}));
 		return memberCache.get(member.toLowerCase());
 	}
 	
@@ -204,10 +208,73 @@ public class GenericCurseforge implements ICurseForge
 	{
 		return prefs;
 	}
-
+	
 	@Override
 	public ISearchResult<FetchableProject> searchProjects(String query)
 	{
 		return new ProjectSearchResult(this, 1, query);
+	}
+	
+	@Override
+	public IProjectList listCategory(String cat, EnumSortRule sort, IGameVersion version)
+	{
+		if(version == null)
+			version = IGameVersion.NULL;
+		HashMap<Integer, GenericProjectList> thisList = listStorage.get(version.toString());
+		if(!thisList.containsKey(1))
+			thisList.put(1, new GenericProjectList(cat, 1, sort, listStorage, this, version));
+		return thisList.get(1);
+	}
+	
+	@Override
+	public <T> Fetchable<T> createFetchable(Supplier<T> get)
+	{
+		return new Fetchable<>(get, prefs.getCacheLifespan().getVal(), prefs.getCacheLifespan().getUnit());
+	}
+	
+	@Override
+	public String url()
+	{
+		return CurseforgeAPI.$cfidg(game());
+	}
+	
+	@Override
+	public Fetchable<List<String>> rootCategories()
+	{
+		if(rootCats == null)
+			rootCats = createFetchable(() ->
+			{
+				String page = ICurseForge.getPage(url() + "projects", true);
+				return Collections.unmodifiableList(CurseforgeAPI.$cptrs(page, "<div class=\"project-category\"><a class=\"project-icon\" href=\"/", "\""));
+			});
+		return rootCats;
+	}
+	
+	@Override
+	public Fetchable<List<IGameVersion>> gameVersions()
+	{
+		if(gameVersions == null)
+			gameVersions = createFetchable(() ->
+			{
+				List<IGameVersion> vs = new ArrayList<>();
+				
+				String cat = rootCategories().get().get(0);
+				String page = ICurseForge.getPage(url() + cat, true);
+				
+				String select = CurseforgeAPI.$cptr(page, "<select id=\"filter-game-version\" name=\"filter-game-version\"", "</select>");
+				for(String item : CurseforgeAPI.$cptrs(select, "<option", "</option>"))
+				{
+					if(item.startsWith("value=\""))
+					{
+						String id = item.substring(7);
+						String[] ids = id.substring(0, id.indexOf("\"")).split(":");
+						String name = item.substring(item.lastIndexOf(">") + 5);
+						vs.add(IGameVersion.create(name, Long.parseLong(ids[1]), Long.parseLong(ids[0])));
+					}
+				}
+				
+				return Collections.unmodifiableList(vs);
+			});
+		return gameVersions;
 	}
 }
