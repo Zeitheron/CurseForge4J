@@ -78,6 +78,8 @@ public class GenericCurseforge implements ICurseForge
 				
 				long projectId = Long.parseLong(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Project ID</div><div class=\"info-data\">", "</div>"));
 				
+				url = url() + "projects/" + projectId;
+				
 				Date created = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Created </div><div class=\"info-data\"><abbr", "</abbr>"));
 				Date lastUpdate = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Last Released File</div><div class=\"info-data\"><abbr", "</abbr>"));
 				long totalDownloads = Long.parseLong(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Total Downloads</div><div class=\"info-data\">", "</div>").replaceAll(",", ""));
@@ -120,7 +122,7 @@ public class GenericCurseforge implements ICurseForge
 				if(name == null)
 					return null;
 				
-				String registeredUserIcon = CurseforgeAPI.$cptr(page, "<div class=\"avatar avatar-100 user user-role-registered-user\">", "</div>");
+				String registeredUserIcon = CurseforgeAPI.$cptr(page, "<div class=\"avatar avatar-100 user user-role-", "</div>");
 				String avatar = CurseforgeAPI.$cptr(registeredUserIcon.toLowerCase(), "<a href=\"/members/" + name.toLowerCase() + "\"><img ", "</a>");
 				if(avatar != null)
 				{

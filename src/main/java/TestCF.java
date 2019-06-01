@@ -22,8 +22,8 @@ public class TestCF
 		prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
 		ICurseForge mc = CurseforgeAPI.minecraft(prefs);
 		
+		System.out.println(mc.member("Ircmaan").get().avatarURL());
 		System.out.println(mc.member("Zeitheron").get().avatarURL());
-		System.out.println(mc.member("Zeitheron").get().avatarURL(800));
 		
 		// Test Project List
 		testProjectList(mc);
