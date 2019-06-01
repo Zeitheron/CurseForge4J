@@ -110,6 +110,8 @@ public class GenericCurseforge implements ICurseForge
 		if(!memberCache.containsKey(member.toLowerCase()))
 			memberCache.put(member.toLowerCase(), createFetchable(() ->
 			{
+				boolean online = false;
+				
 				String base = url() + "members/" + member;
 				String page = ICurseForge.getPage(base, true);
 				
@@ -118,12 +120,16 @@ public class GenericCurseforge implements ICurseForge
 				if(name == null)
 					return null;
 				
-				String avatar = CurseforgeAPI.$cptr(page, "<a href=\"/members/" + name + "\"><img ", "</a>");
+				String registeredUserIcon = CurseforgeAPI.$cptr(page, "<div class=\"avatar avatar-100 user user-role-registered-user\">", "</div>");
+				String avatar = CurseforgeAPI.$cptr(registeredUserIcon.toLowerCase(), "<a href=\"/members/" + name.toLowerCase() + "\"><img ", "</a>");
 				if(avatar != null)
 				{
 					int start = avatar.indexOf("src=\"") + 5;
 					int end = avatar.indexOf("\"", start);
 					avatar = avatar.substring(start, end);
+					int io = registeredUserIcon.toLowerCase().indexOf(avatar);
+					avatar = registeredUserIcon.substring(io, io + avatar.length());
+					online = registeredUserIcon.contains("<i class=\"u-icon u-icon-online\"></i>");
 				}
 				String memberSince = CurseforgeAPI.$cptr(page, "Member Since: ", "\">");
 				Date registerDate = null;
@@ -192,7 +198,7 @@ public class GenericCurseforge implements ICurseForge
 					return Collections.unmodifiableList(new ArrayList<>(located));
 				};
 				
-				return new CMember(registerDate, lastActive, avatar, name, new MemberPosts(comments, forumPosts), new MemberThanks(th_gvn, th_rcv), followers, projects, this, base, followerList);
+				return new CMember(registerDate, lastActive, avatar, name, new MemberPosts(comments, forumPosts), new MemberThanks(th_gvn, th_rcv), followers, projects, this, base, followerList, online);
 			}));
 		return memberCache.get(member.toLowerCase());
 	}

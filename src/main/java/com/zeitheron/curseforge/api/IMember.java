@@ -32,4 +32,6 @@ public interface IMember
 	ICurseForge curseForge();
 	
 	String url();
+	
+	boolean online();
 }

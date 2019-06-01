@@ -22,8 +22,9 @@ public class CMember implements IMember
 	@Ignore
 	protected final ICurseForge cf;
 	protected final String url;
+	protected final boolean online;
 	
-	public CMember(Date register, Date lastActive, String avatar, String name, MemberPosts posts, MemberThanks thanks, long followers, Supplier<List<FetchableProject>> projects, ICurseForge cf, String url, Supplier<List<String>> followerList)
+	public CMember(Date register, Date lastActive, String avatar, String name, MemberPosts posts, MemberThanks thanks, long followers, Supplier<List<FetchableProject>> projects, ICurseForge cf, String url, Supplier<List<String>> followerList, boolean online)
 	{
 		this.register = register;
 		this.lastActive = lastActive;
@@ -36,6 +37,7 @@ public class CMember implements IMember
 		this.followerList = cf.createFetchable(followerList);
 		this.cf = cf;
 		this.url = url;
+		this.online = online;
 	}
 	
 	@Override
@@ -108,11 +110,38 @@ public class CMember implements IMember
 	public String avatarURL(int size)
 	{
 		String url = avatarURL();
+		
+		int jtvnw = url.lastIndexOf("profile_image-");
+		if(jtvnw != -1)
+		{
+			String resolution = url.substring(jtvnw + 14, url.lastIndexOf('.'));
+			if(resolution.contains("x"))
+				return url;
+			if(resolution.length() == -1)
+			{
+				String[] parts = resolution.split("x");
+				int width = Integer.parseInt(parts[0]);
+				int height = Integer.parseInt(parts[1]);
+				float ratioW = size / (float) width;
+				float ratioH = size / (float) height;
+				float ratio = Math.max(ratioW, ratioH);
+				int nw = Math.round(width * ratio);
+				int nh = Math.round(height * ratio);
+				return url.replace("profile_image-" + resolution, "profile_image-" + nw + "x" + nh);
+			}
+		}
+		
 		if(url.contains("?"))
 			url += "&size=" + size;
 		else
 			url += "?size=" + size;
 		return url;
+	}
+	
+	@Override
+	public boolean online()
+	{
+		return online;
 	}
 	
 	@Override

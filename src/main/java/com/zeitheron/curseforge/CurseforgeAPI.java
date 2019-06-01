@@ -24,7 +24,7 @@ public class CurseforgeAPI
 	
 	public static String version()
 	{
-		return "v1.3";
+		return "v1.3.1";
 	}
 	
 	public static ICurseForge minecraft()

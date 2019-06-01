@@ -22,6 +22,9 @@ public class TestCF
 		prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
 		ICurseForge mc = CurseforgeAPI.minecraft(prefs);
 		
+		System.out.println(mc.member("Zeitheron").get().avatarURL());
+		System.out.println(mc.member("Zeitheron").get().avatarURL(800));
+		
 		// Test Project List
 		testProjectList(mc);
 		
@@ -98,6 +101,9 @@ public class TestCF
 		
 		System.out.println("Latest:");
 		printFileInfo(latest, "  ");
+		
+		System.out.println("Searching for the file... ");
+		System.out.println(mc.searchProjects(latest.md5()).getElements());
 	}
 	
 	private static void printFileInfo(IProjectFile file, String prefix)
