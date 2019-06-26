@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.zeitheron.curseforge.CurseforgeAPI;
 import com.zeitheron.curseforge.api.ICurseForge;
 import com.zeitheron.curseforge.api.IProject;
 import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
@@ -26,19 +27,10 @@ public class ProjectFilePage
 			if(page == 1)
 				pg = project.files().firstPage.get();
 			else
-				pg = ICurseForge.getPage(project.url() + "/files?page=" + page, true);
-			
+				pg = ICurseForge.getPage(project.url() + "/files/all?page=" + page, true);
 			List<String> fis = new ArrayList<>();
-			
-			int i;
-			while((i = pg.indexOf("/files/")) != -1)
-			{
-				pg = pg.substring(i + 7);
-				String fi = pg.substring(0, pg.indexOf('"'));
-				if(!fi.equals("latest") && !fi.contains("download") && !fi.contains("#") && !fis.contains(fi))
-					fis.add(fi);
-			}
-			
+			for(String sub : CurseforgeAPI.$cptrs(pg, "<a data-action=\"file-link\" href=\"", "</a>"))
+				fis.add(CurseforgeAPI.$cptr(sub, "/files/", "\">"));
 			return fis.stream().map(fi -> new FetchableFile(project, fi)).collect(Collectors.toList());
 		});
 	}

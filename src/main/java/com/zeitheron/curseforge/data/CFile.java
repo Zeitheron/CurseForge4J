@@ -11,9 +11,11 @@ import com.zeitheron.curseforge.CurseforgeAPI;
 import com.zeitheron.curseforge.api.ICurseForge;
 import com.zeitheron.curseforge.api.IProject;
 import com.zeitheron.curseforge.api.IProjectFile;
+import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
 
 public class CFile implements IProjectFile
 {
+	@Ignore
 	private static final Map<String, Long> bytes = new HashMap<>();
 	static
 	{
@@ -23,6 +25,7 @@ public class CFile implements IProjectFile
 		bytes.put("tb", 1024L * 1024L * 1024L * 1024L);
 	}
 	
+	@Ignore
 	protected final IProject project;
 	protected final String id, displayName, fileName, md5;
 	protected final Date uploaded;
@@ -115,17 +118,35 @@ public class CFile implements IProjectFile
 		return changelog;
 	}
 	
+	@Override
+	public String size()
+	{
+		return size;
+	}
+	
+	@Override
+	public long sizeBytes()
+	{
+		return sizel;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return ToStringHelper.toString(this);
+	}
+	
 	public static IProjectFile create(IProject proj, String id)
 	{
 		String url = proj.url() + "/files/" + id;
 		String page = ICurseForge.getPage(url, true);
 		
-		String displayName = CurseforgeAPI.$cptr(page, "<h3 class=\"overflow-tip\">", "</h3>");
-		String fileName = CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Filename</div><div class=\"info-data overflow-tip\">", "</div>");
+		String displayName = CurseforgeAPI.$cptr(page, "<h3 class=\"text-primary-500 text-lg\">", "</h3>");
+		String fileName = CurseforgeAPI.$cptr(page, "<div class=\"flex flex-col mr-2\"><span class=\"font-bold text-sm leading-loose mb-1\">Filename</span><span class=\"text-sm\">", "</span></div>");
 		
 		FetchableMember uploader = null;
 		{
-			String userTag = CurseforgeAPI.$cptr(page, "<div class=\"user-tag\">", "</a></div>");
+			String userTag = CurseforgeAPI.$cptr(page, "<div class=\"flex flex-col mr-2\"><span class=\"font-bold text-sm leading-loose mb-1\">Uploaded by</span>", "</span></a></div>");
 			for(FetchableMember pm : proj.membersList())
 				if(userTag.contains(pm.name()))
 				{
@@ -134,39 +155,23 @@ public class CFile implements IProjectFile
 				}
 		}
 		
-		String downloadsStr = CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Downloads</div><div class=\"info-data\">", "</div>");
+		String downloadsStr = CurseforgeAPI.$cptr(page, "<span class=\"font-bold text-sm leading-loose mb-1\">Downloads</span><span class=\"text-sm\">", "</span>");
 		long downloads = Long.parseLong(downloadsStr.replaceAll(",", "").replaceAll(" ", ""));
 		
-		String md5 = CurseforgeAPI.$cptr(page, "<span class=\"md5\">", "</span>");
+		String md5 = CurseforgeAPI.$cptr(page, "<div class=\"flex flex-col\"><span class=\"font-bold text-sm leading-loose mb-1\">MD5</span><span class=\"text-sm\">", "</span>");
 		
 		Date uploaded = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Uploaded</div>", "</abbr></div>"));
 		
 		List<String> fis = new ArrayList<>();
 		
-		{
-			String add = CurseforgeAPI.$cptr(page, "<tbody>", "</tbody>");
-			if(add != null)
-			{
-				fis.addAll(CurseforgeAPI.$cptrs(add, "/files/", "\""));
-				fis.removeIf(s -> s.contains("download"));
-			}
-		}
+		String add = CurseforgeAPI.$cptr(page, "<table class=\"listing listing-project-file", "</tbody></table>");
+		if(add != null)
+			fis.addAll(CurseforgeAPI.$cptrs(add, "/download/", "\""));
+		fis.removeIf(s -> s.contains("?"));
 		
-		String changelog = CurseforgeAPI.$rlnk(CurseforgeAPI.$cptr(page, "<div class=\"logbox\">", "</div></section>"));
-		String size = CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Size</div><div class=\"info-data\">", "</div>");
+		String changelog = CurseforgeAPI.$rlnk(CurseforgeAPI.$cptr(page, "<h4 class=\"font-bold text-sm mb-2\">Changelog</h4><div class=\"bg-accent rounded py-1 pl-1 border-primary-100 border text-gray-500\"><div class=\"user-content min max-h-60 overflow-auto block\">", "</div></div></div>"));
+		String size = CurseforgeAPI.$cptr(page, "<div class=\"flex flex-col mr-2\"><span class=\"font-bold text-sm leading-loose mb-1\">Size</span><span class=\"text-sm\">", "</span>");
 		
-		return new CFile(proj, id, displayName, fileName, md5, uploaded, downloads, fis, uploader, changelog, size);
-	}
-
-	@Override
-	public String size()
-	{
-		return size;
-	}
-
-	@Override
-	public long sizeBytes()
-	{
-		return sizel;
+		return new CFile(proj, id, displayName == null || displayName.isEmpty() ? fileName : displayName, fileName, md5, uploaded, downloads, fis, uploader, changelog, size);
 	}
 }

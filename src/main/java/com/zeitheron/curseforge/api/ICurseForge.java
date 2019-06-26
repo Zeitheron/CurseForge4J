@@ -51,6 +51,7 @@ public interface ICurseForge
 	
 	static String getPage(String url, boolean format)
 	{
+//		System.out.println("GET " + url);
 		try
 		{
 			HttpURLConnection urlc = (HttpURLConnection) new URL(url).openConnection();

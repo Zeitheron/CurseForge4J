@@ -24,7 +24,7 @@ public class CurseforgeAPI
 	
 	public static String version()
 	{
-		return "v1.4.0";
+		return "v1.4.1";
 	}
 	
 	public static ICurseForge www()

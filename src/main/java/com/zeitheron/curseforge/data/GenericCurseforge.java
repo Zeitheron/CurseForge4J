@@ -65,8 +65,6 @@ public class GenericCurseforge implements ICurseForge
 				
 				long projectId = Long.parseLong(CurseforgeAPI.$cptr(page, "<span>Project ID</span><span>", "</span>"));
 				
-				url = url() + "projects/" + projectId;
-				
 				Date created = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Created </div><div class=\"info-data\"><abbr", "</abbr>"));
 				Date lastUpdate = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Last Released File</div><div class=\"info-data\"><abbr", "</abbr>"));
 				long totalDownloads = Long.parseLong(CurseforgeAPI.$cptr(page, "<span>Total Downloads</span><span>", "</span>").replaceAll(",", ""));
@@ -102,8 +100,8 @@ public class GenericCurseforge implements ICurseForge
 			{
 				boolean online = false;
 				
-				String base = url() + "members/" + member + "/projects";
-				String page = ICurseForge.getPage(base, true);
+				String base = url() + "members/" + member.toLowerCase();
+				String page = ICurseForge.getPage(base + "/projects", true);
 				
 				String name = CurseforgeAPI.$cptr(page, "<div class=\"username text-xl\">", "</div>");
 				
@@ -154,7 +152,7 @@ public class GenericCurseforge implements ICurseForge
 					int i = 1;
 					while(true)
 					{
-						String pg = ICurseForge.getPage(base + "?page=" + i, true);
+						String pg = ICurseForge.getPage(base + "/projects?page=" + i, true);
 						int added = 0;
 						{
 							for(String v : CurseforgeAPI.$cptrs(pg, "<li class=\"latest-post-item project-list-bubble-item\">", "</figure></div></div></li>"))
@@ -179,10 +177,10 @@ public class GenericCurseforge implements ICurseForge
 				
 				Supplier<List<String>> followerList = () ->
 				{
-					String txt = ICurseForge.getPage(base + "/followers", true);
+					String txt = ICurseForge.getPage(base + "/followers", true).toLowerCase();
 					Set<String> located = new HashSet<>(CurseforgeAPI.$cptrs(txt, "<a href=\"/members/", "\""));
 					located.removeIf(s -> s.contains("/"));
-					located.remove(member);
+					located.remove(member.toLowerCase());
 					return Collections.unmodifiableList(new ArrayList<>(located));
 				};
 				

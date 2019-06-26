@@ -37,7 +37,7 @@ public class TestCF
 			// Test Search
 			testSearch(mc);
 			
-			// Print newest version of Hammer Lib
+			// Print newest version of JEI
 			testFileList(mc);
 		} catch(Throwable err)
 		{
@@ -57,7 +57,7 @@ public class TestCF
 	
 	public static void testFileList(ICurseForge mc)
 	{
-		IProject project = mc.project("hammer-lib").get();
+		IProject project = mc.project("minecraft/mc-mods/hammer-lib").get();
 		
 		System.out.println("Listing all files...");
 		for(int page = 1; page <= project.files().pageCount(); ++page)
@@ -149,7 +149,11 @@ public class TestCF
 		IProject project = member.projects().get(0).fetch().get();
 		
 		System.out.println("Newest updated project: " + project);
-		System.out.println("Latest:");
-		printFileInfo(project.files().latest().fetch().get(), "  ");
+		System.out.println("Latest: ");
+		printFileInfo(project
+				.files()
+				.latest()
+				.fetch()
+				.get(), "  ");
 	}
 }

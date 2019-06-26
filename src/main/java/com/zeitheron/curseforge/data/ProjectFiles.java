@@ -1,8 +1,11 @@
 package com.zeitheron.curseforge.data;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.zeitheron.curseforge.CurseforgeAPI;
 import com.zeitheron.curseforge.api.ICurseForge;
 import com.zeitheron.curseforge.api.IProject;
 import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
@@ -20,22 +23,16 @@ public class ProjectFiles
 	{
 		this.project = project;
 		ICurseForge cf = project.curseForge();
-		this.firstPage = cf.createFetchable(() -> ICurseForge.getPage(project.url() + "/files", true));
+		this.firstPage = cf.createFetchable(() -> ICurseForge.getPage(project.url() + "/files/all", true));
 		this.pageCount = cf.createFetchable(() ->
 		{
-			int mp = 0;
 			String str = this.firstPage.get();
-			int i;
-			boolean hasFile = str.contains("/files/");
-			while((i = str.indexOf("/files?page=")) != -1)
-			{
-				str = str.substring(i + 12);
-				String pi = str.substring(0, str.indexOf('"'));
-				mp = Math.max(mp, Integer.parseInt(pi));
-			}
-			if(mp == 0 && hasFile)
+			boolean hasFile = str.contains("/download");
+			List<Integer> ints = CurseforgeAPI.$cptrs(str, "/files/all?page=", "\"").stream().map(Integer::parseInt).collect(Collectors.toList());
+			ints.sort((a, b) -> b - a);
+			if(ints.isEmpty() && hasFile)
 				return 1;
-			return mp;
+			return ints.isEmpty() ? 0 : ints.get(0);
 		});
 	}
 	
