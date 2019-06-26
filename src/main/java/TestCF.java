@@ -2,13 +2,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.zeitheron.curseforge.CurseforgeAPI;
-import com.zeitheron.curseforge.api.EnumSortRule;
 import com.zeitheron.curseforge.api.ICurseForge;
-import com.zeitheron.curseforge.api.IGameVersion;
 import com.zeitheron.curseforge.api.IMember;
 import com.zeitheron.curseforge.api.IProject;
 import com.zeitheron.curseforge.api.IProjectFile;
-import com.zeitheron.curseforge.api.IProjectList;
 import com.zeitheron.curseforge.data.CurseForgePrefs;
 import com.zeitheron.curseforge.data.FetchableFile;
 import com.zeitheron.curseforge.data.FetchableProject;
@@ -18,40 +15,34 @@ public class TestCF
 {
 	public static void main(String[] args)
 	{
-		CurseForgePrefs prefs = new CurseForgePrefs();
-		prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
-		ICurseForge mc = CurseforgeAPI.minecraft(prefs);
-		
-		System.out.println(mc.member("Ircmaan").get().avatarURL());
-		System.out.println(mc.member("Zeitheron").get().avatarURL());
-		
-		// Test Project List
-		testProjectList(mc);
-		
-		// Test Search
-		testSearch(mc);
-		
-		// Print newest version of Hammer Lib
-		testFileList(mc);
-		
-		for(int i = 0; i < 8; ++i)
-			System.out.println();
+		try
+		{
+			CurseForgePrefs prefs = new CurseForgePrefs();
+			prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
+			ICurseForge mc = CurseforgeAPI.www(prefs);
 			
-		// Run first iteration - it is going to be slow, since we cache
-		// everything
-		test(mc);
-	}
-	
-	public static void testProjectList(ICurseForge mc)
-	{
-		IGameVersion ver = mc.gameVersions().get().stream().filter(v -> v.displayName().equals("1.13.2")).findFirst().orElse(null);
-		
-		IProjectList list = mc.listCategory(CurseforgeAPI.CATEGORY_MC_MODS, EnumSortRule.LAST_UPDATED, ver);
-		
-		System.out.println("First page of last updates mods:");
-		for(FetchableProject fp : list.projects().get())
-			System.out.println(" - " + fp.name());
-		System.out.println("-------------------------------");
+			System.out.println(mc.member("Ircmaan").get());
+			System.out.println(mc.member("Zeitheron").get());
+			
+			for(int i = 0; i < 8; ++i)
+				System.out.println();
+				
+			// Run first iteration - it is going to be slow, since we cache
+			// everything
+			test(mc);
+			
+			for(int i = 0; i < 8; ++i)
+				System.out.println();
+			
+			// Test Search
+			testSearch(mc);
+			
+			// Print newest version of Hammer Lib
+			testFileList(mc);
+		} catch(Throwable err)
+		{
+			err.printStackTrace();
+		}
 	}
 	
 	public static void testSearch(ICurseForge mc)
@@ -135,7 +126,7 @@ public class TestCF
 		System.out.println("Registered @: " + member.registerDate());
 		System.out.println("Last active: " + member.lastActive());
 		System.out.println("Followers: " + member.followers() + " " + member.followerList());
-		System.out.println("Posts: " + member.posts().total() + " Total - " + member.posts().comments() + " comments, " + member.posts().forumPosts() + " forum posts.");
+		System.out.println("Posts: " + member.posts().total() + " Total");
 		System.out.println("Thanks: " + member.thanks().total() + " Total - " + member.thanks().received() + " received, " + member.thanks().given() + " given.");
 		System.out.println("Projects: " + member.projects().size());
 		

@@ -102,7 +102,7 @@ public class ProjectSearchResult implements ISearchResult<FetchableProject>
 				{
 					String id = CurseforgeAPI.$cptr(tr, "projectID=", "\"");
 					String name = CurseforgeAPI.$cptr(tr.substring(tr.lastIndexOf(id) - 20), "projectID=" + id + "\">", "</a>");
-					projects.add(new FetchableProject(name, id, cf));
+					projects.add(new FetchableProject(name, id, null, cf));
 				}
 			} catch(UnsupportedEncodingException e)
 			{

@@ -30,7 +30,6 @@ public class GenericCurseforge implements ICurseForge
 	final Map<String, Fetchable<IMember>> memberCache = new HashMap<>();
 	final DefaultableMap<String, HashMap<Integer, GenericProjectList>> listStorage = new DefaultableMap<>(s -> new HashMap<>());
 	Fetchable<List<String>> rootCats;
-	Fetchable<List<IGameVersion>> gameVersions;
 	
 	GenericCurseforge(String game)
 	{
@@ -43,7 +42,7 @@ public class GenericCurseforge implements ICurseForge
 		if(!projectCache.containsKey(project.toLowerCase()))
 			projectCache.put(project.toLowerCase(), createFetchable(() ->
 			{
-				String url = url() + "projects/" + project;
+				String url = url() + project;
 				
 				String page = ICurseForge.getPage(url, true);
 				
@@ -57,51 +56,40 @@ public class GenericCurseforge implements ICurseForge
 				
 				String avatar = null, thumbnail = null;
 				{
-					String avs = CurseforgeAPI.$cptr(page, "<div class=\"avatar-wrapper\">", "</div>");
-					int fs = avs.indexOf("href=\"");
-					if(fs >= 0)
-					{
-						fs += 6;
-						int fe = avs.indexOf('\"', fs);
-						avatar = avs.substring(fs, fe);
-					}
-					int ps = avs.indexOf("src=\"");
-					if(ps >= 0)
-					{
-						ps += 5;
-						int pe = avs.indexOf('\"', ps);
-						thumbnail = avs.substring(ps, pe);
-					}
+					String avs = CurseforgeAPI.$cptr(page, "<div class=\"project-avatar project-avatar-64\">", "</a></div>");
+					avatar = CurseforgeAPI.$cptr(avs, "data-featherlight=\"", "\">");
+					thumbnail = CurseforgeAPI.$cptr(avs, "<img src=\"", "\"");
 				}
 				
 				String desc = CurseforgeAPI.$cptr(page, "<div class=\"project-description\" data-user-content>", "</div></div>");
 				
-				long projectId = Long.parseLong(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Project ID</div><div class=\"info-data\">", "</div>"));
+				long projectId = Long.parseLong(CurseforgeAPI.$cptr(page, "<span>Project ID</span><span>", "</span>"));
 				
 				url = url() + "projects/" + projectId;
 				
 				Date created = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Created </div><div class=\"info-data\"><abbr", "</abbr>"));
 				Date lastUpdate = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Last Released File</div><div class=\"info-data\"><abbr", "</abbr>"));
-				long totalDownloads = Long.parseLong(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Total Downloads</div><div class=\"info-data\">", "</div>").replaceAll(",", ""));
+				long totalDownloads = Long.parseLong(CurseforgeAPI.$cptr(page, "<span>Total Downloads</span><span>", "</span>").replaceAll(",", ""));
 				
 				List<FetchableMember> members = new ArrayList<>();
 				{
-					String rawMembers = CurseforgeAPI.$cptr(page, "<div class=\"cf-sidebar-inner\"><ul class=\"cf-details project-members\">", "</ul></div>");
-					String[] mba = rawMembers.split("<li class=");
-					for(int i = 1; i < mba.length; ++i)
+					String rawMembers = CurseforgeAPI.$cptr(page, "<h3 class=\"font-bold mb-3 text-lg\">Members</h3>", "</div></div></div></div>") + "</div></div></div></div>";
+					
+					for(String member : CurseforgeAPI.$cptrs(rawMembers, "<div class=\"flex mb-2\">", "</div></div>"))
 					{
-						String mbr = mba[i];
-						String mbn = CurseforgeAPI.$cptr(mbr, "<span>", "</span>");
-						String mbk = CurseforgeAPI.$cptr(mbr, "<span class=\"title\">", "</span>");
-						if(mbn != null && mbk != null)
-							members.add(new FetchableMember(mbn, mbk, this));
+						String msl = CurseforgeAPI.$cptr(member, "<a href=\"/members/", "\">");
+						String mname = CurseforgeAPI.$cptr(member, "<a href=\"/members/" + msl + "\"><span>", "</span></a>");
+						String mrole = CurseforgeAPI.$cptr(member, "<p class=\"text-xs\">", "</p>");
+						members.add(new FetchableMember(mname, mrole, this));
 					}
 				}
-				;
 				
-				String rootGameCategory = CurseforgeAPI.$cptr(CurseforgeAPI.$cptr(page, "\"RootGameCategory\">", "</h2>"), "href=\"/", "\">");
+				String[] data = project.split("/");
 				
-				return new CProject(name, overview, CurseforgeAPI.$rlnk(desc), avatar, thumbnail, created, lastUpdate, projectId, totalDownloads, members, this, url, rootGameCategory);
+				String rootGame = data[0];
+				String rootGameCategory = data[1];
+				
+				return new CProject(name, overview, CurseforgeAPI.$rlnk(desc), avatar, thumbnail, created, lastUpdate, projectId, totalDownloads, members, this, url, rootGameCategory, rootGame);
 			}));
 		return projectCache.get(project.toLowerCase());
 	}
@@ -114,15 +102,15 @@ public class GenericCurseforge implements ICurseForge
 			{
 				boolean online = false;
 				
-				String base = url() + "members/" + member;
+				String base = url() + "members/" + member + "/projects";
 				String page = ICurseForge.getPage(base, true);
 				
-				String name = CurseforgeAPI.$cptr(page, "<li class=\"username\">", "</li>");
+				String name = CurseforgeAPI.$cptr(page, "<div class=\"username text-xl\">", "</div>");
 				
 				if(name == null)
 					return null;
 				
-				String registeredUserIcon = CurseforgeAPI.$cptr(page, "<div class=\"avatar avatar-100 user user-role-", "</div>");
+				String registeredUserIcon = CurseforgeAPI.$cptr(page, "<div class=\"user-avatar pr-5\">", "</div></div>");
 				String avatar = CurseforgeAPI.$cptr(registeredUserIcon.toLowerCase(), "<a href=\"/members/" + name.toLowerCase() + "\"><img ", "</a>");
 				if(avatar != null)
 				{
@@ -146,17 +134,17 @@ public class GenericCurseforge implements ICurseForge
 				
 				Date lastActive = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "Last active <abbr class=\"tip standard-datetime-precise\" title=\"", "\">"));
 				
-				String followersStr = CurseforgeAPI.$cptr(page, "<li class=\"followers\"><span>", "</span>");
+				String followersStr = CurseforgeAPI.$cptr(page, "<div class=\"followers w-1/3 border-r text-center p-3 border-gray--100\"><span>", "</span>");
 				long followers = Long.parseLong(followersStr.split(" ")[0]);
 				
-				String postsStr = CurseforgeAPI.$cptr(page, "<li class=\"posts\"><span class=\"tip\" title=\"", "\">");
+				String postsStr = CurseforgeAPI.$cptr(page, "<div class=\"posts w-1/3 border-r text-center p-3 border-gray--100\"><span class=\"tip\" title=\"(", "\">");
 				String[] postMeta$ = postsStr.split(", ");
 				long comments = Long.parseLong(postMeta$[0].split(" ")[0].substring(1));
 				long forumPosts = Long.parseLong(postMeta$[1].split(" ")[0]);
 				
-				String likesStr = CurseforgeAPI.$cptr(page, "<li class=\"likes\"><span class=\"tip\" title=\"", "\">");
+				String likesStr = CurseforgeAPI.$cptr(page, "<div class=\"likes w-1/3 text-center p-3 border-gray--100\"><span class=\"tip\" title=\"(", ")\">");
 				String[] likeMeta$ = likesStr.split(", ");
-				long th_rcv = Long.parseLong(likeMeta$[0].split(" ")[0].substring(1));
+				long th_rcv = Long.parseLong(likeMeta$[0].split(" ")[0]);
 				long th_gvn = Long.parseLong(likeMeta$[1].split(" ")[0]);
 				
 				Supplier<List<FetchableProject>> projects = () ->
@@ -166,22 +154,20 @@ public class GenericCurseforge implements ICurseForge
 					int i = 1;
 					while(true)
 					{
-						String pg = ICurseForge.getPage(base + "/projects?page=" + i, true);
+						String pg = ICurseForge.getPage(base + "?page=" + i, true);
 						int added = 0;
 						{
-							String[] values = pg.split("<a href=\"/projects");
-							for(String v : values)
-								if(v.charAt(0) == '/')
+							for(String v : CurseforgeAPI.$cptrs(pg, "<li class=\"latest-post-item project-list-bubble-item\">", "</figure></div></div></li>"))
+							{
+								String pr = CurseforgeAPI.$cptr(v, "<a href=\"/", "\"");
+								String avt = CurseforgeAPI.$cptr(v, "<img src=\"", "\" alt");
+								if(!ids.contains(pr))
 								{
-									int e;
-									String pr = v.substring(1, e = v.indexOf("\">"));
-									if(!ids.contains(pr))
-									{
-										ids.add(pr);
-										prs.add(new FetchableProject(v.substring(e + 2, v.indexOf("</a>")), pr, this));
-										++added;
-									}
+									ids.add(pr);
+									prs.add(new FetchableProject(CurseforgeAPI.$cptr(CurseforgeAPI.$cptr(v, "<h4>", "</h4>"), "\">", "</a>"), pr, avt, this));
+									++added;
 								}
+							}
 						}
 						if(added == 0)
 							break;
@@ -256,33 +242,5 @@ public class GenericCurseforge implements ICurseForge
 				return Collections.unmodifiableList(CurseforgeAPI.$cptrs(page, "<div class=\"project-category\"><a class=\"project-icon\" href=\"/", "\""));
 			});
 		return rootCats;
-	}
-	
-	@Override
-	public Fetchable<List<IGameVersion>> gameVersions()
-	{
-		if(gameVersions == null)
-			gameVersions = createFetchable(() ->
-			{
-				List<IGameVersion> vs = new ArrayList<>();
-				
-				String cat = rootCategories().get().get(0);
-				String page = ICurseForge.getPage(url() + cat, true);
-				
-				String select = CurseforgeAPI.$cptr(page, "<select id=\"filter-game-version\" name=\"filter-game-version\"", "</select>");
-				for(String item : CurseforgeAPI.$cptrs(select, "<option", "</option>"))
-				{
-					if(item.startsWith("value=\""))
-					{
-						String id = item.substring(7);
-						String[] ids = id.substring(0, id.indexOf("\"")).split(":");
-						String name = item.substring(item.lastIndexOf(">") + 5);
-						vs.add(IGameVersion.create(name, Long.parseLong(ids[1]), Long.parseLong(ids[0])));
-					}
-				}
-				
-				return Collections.unmodifiableList(vs);
-			});
-		return gameVersions;
 	}
 }

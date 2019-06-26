@@ -21,11 +21,11 @@ public class CProject implements IProject
 	@Ignore
 	protected final ProjectFiles files;
 	protected final String url;
-	protected final String gameCategory;
+	protected final String game, gameCategory;
 	@Ignore
 	protected final String desc;
 	
-	public CProject(String name, String overview, String desc, String avatar, String thumb, Date create, Date update, long id, long downloads, List<FetchableMember> members, ICurseForge cf, String url, String gameCategory)
+	public CProject(String name, String overview, String desc, String avatar, String thumb, Date create, Date update, long id, long downloads, List<FetchableMember> members, ICurseForge cf, String url, String gameCategory, String game)
 	{
 		this.name = name;
 		this.overview = overview;
@@ -33,6 +33,7 @@ public class CProject implements IProject
 		this.avatar = avatar;
 		this.thumb = thumb;
 		this.create = create;
+		this.game = game;
 		this.update = update;
 		this.id = id;
 		this.downloads = downloads;
@@ -126,6 +127,12 @@ public class CProject implements IProject
 	public String url()
 	{
 		return url;
+	}
+	
+	@Override
+	public String game()
+	{
+		return game;
 	}
 	
 	@Override

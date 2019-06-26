@@ -24,17 +24,17 @@ public class CurseforgeAPI
 	
 	public static String version()
 	{
-		return "v1.3.2";
+		return "v1.4.0";
 	}
 	
-	public static ICurseForge minecraft()
+	public static ICurseForge www()
 	{
-		return $.create(GenericCurseforge.class, "minecraft");
+		return $.create(GenericCurseforge.class, "www");
 	}
 	
-	public static ICurseForge minecraft(CurseForgePrefs prefs)
+	public static ICurseForge www(CurseForgePrefs prefs)
 	{
-		ICurseForge cf = $.create(GenericCurseforge.class, "minecraft");
+		ICurseForge cf = $.create(GenericCurseforge.class, "www");
 		cf.preferences().inheritFrom(prefs);
 		return cf;
 	}

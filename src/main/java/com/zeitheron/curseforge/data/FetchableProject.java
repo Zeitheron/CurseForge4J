@@ -6,17 +6,18 @@ import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
 
 public class FetchableProject
 {
-	protected final String name, slug;
+	protected final String name, slug, avatar;
 	@Ignore
 	protected final ICurseForge cf;
 	@Ignore
 	protected final Fetchable<IProject> project;
 	
-	public FetchableProject(String name, String slug, ICurseForge cf)
+	public FetchableProject(String name, String slug, String avatar, ICurseForge cf)
 	{
 		this.name = name;
 		this.slug = slug;
 		this.cf = cf;
+		this.avatar = avatar;
 		this.project = cf.project(slug);
 	}
 	
@@ -33,6 +34,11 @@ public class FetchableProject
 	public String slug()
 	{
 		return slug;
+	}
+	
+	public String avatar()
+	{
+		return avatar;
 	}
 	
 	@Override

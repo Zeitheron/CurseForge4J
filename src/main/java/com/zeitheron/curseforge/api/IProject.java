@@ -34,6 +34,8 @@ public interface IProject
 	
 	String url();
 	
+	String game();
+	
 	String category();
 	
 	ICurseForge curseForge();

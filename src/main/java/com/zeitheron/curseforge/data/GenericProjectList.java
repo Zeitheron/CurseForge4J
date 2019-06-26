@@ -42,7 +42,7 @@ class GenericProjectList implements IProjectList
 			{
 				String name = CurseforgeAPI.$cptr(item, "<div class=\"name-wrapper overflow-tip\"><a href=\"/projects/", "</a></div>");
 				String[] idName = name.split("\">");
-				ps.add(new FetchableProject(StringUtils.unescapeHtml3(idName[1]), idName[0], cf));
+				ps.add(new FetchableProject(StringUtils.unescapeHtml3(idName[1]), idName[0], null, cf));
 			}
 			return Collections.unmodifiableList(ps);
 		});

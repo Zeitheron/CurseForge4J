@@ -47,7 +47,7 @@ public interface ICurseForge
 	
 	Fetchable<List<String>> rootCategories();
 	
-	Fetchable<List<IGameVersion>> gameVersions();
+//	Fetchable<List<IGameVersion>> gameVersions();
 	
 	static String getPage(String url, boolean format)
 	{
