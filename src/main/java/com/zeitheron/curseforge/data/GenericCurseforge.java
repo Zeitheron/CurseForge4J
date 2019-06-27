@@ -75,7 +75,7 @@ public class GenericCurseforge implements ICurseForge
 					thumbnail = CurseforgeAPI.$cptr(avs, "<img src=\"", "\"");
 				}
 				
-				String desc = CurseforgeAPI.$cptr(page, "<div class=\"project-description\" data-user-content>", "</div></div>");
+				String desc = CurseforgeAPI.$cptr(page, "<section class=\"flex flex-col project-detail\"><div class=\"box p-4 pb-2 project-detail__content\" data-user-content>", "</div><div class=\"mt-6\"></div></section>");
 				
 				long projectId = Long.parseLong(CurseforgeAPI.$cptr(page, "<span>Project ID</span><span>", "</span>"));
 				

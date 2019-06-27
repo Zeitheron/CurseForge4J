@@ -21,9 +21,6 @@ public class TestCF
 			prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
 			ICurseForge mc = CurseforgeAPI.www(prefs);
 			
-			// Print newest version of JEI
-			testFileList(mc);
-			
 			System.out.println(mc.member("Ircmaan").get());
 			System.out.println(mc.member("Zeitheron").get());
 			
@@ -39,6 +36,9 @@ public class TestCF
 			
 			// Test Search
 			testSearch(mc);
+			
+			// Print newest version of JEI
+			testFileList(mc);
 		} catch(Throwable err)
 		{
 			err.printStackTrace();
@@ -148,7 +148,7 @@ public class TestCF
 		
 		IProject project = member.projects().get(0).fetch().get();
 		
-		System.out.println("Newest updated project: " + project);
+		System.out.println("Newest updated project: " + project.description());
 		System.out.println("Latest: ");
 		printFileInfo(project
 				.files()
