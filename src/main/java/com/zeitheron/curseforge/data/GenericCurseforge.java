@@ -28,12 +28,26 @@ public class GenericCurseforge implements ICurseForge
 	final CurseForgePrefs prefs = new CurseForgePrefs();
 	final Map<String, Fetchable<IProject>> projectCache = new HashMap<>();
 	final Map<String, Fetchable<IMember>> memberCache = new HashMap<>();
+	final Map<Long, Fetchable<String>> projectIdToStrMap = new HashMap<>();
 	final DefaultableMap<String, HashMap<Integer, GenericProjectList>> listStorage = new DefaultableMap<>(s -> new HashMap<>());
 	Fetchable<List<String>> rootCats;
 	
 	GenericCurseforge(String game)
 	{
 		this.game = game;
+	}
+	
+	@Override
+	public Fetchable<String> projectIdByLID(long lid)
+	{
+		if(!projectIdToStrMap.containsKey(lid))
+			projectIdToStrMap.put(lid, createFetchable(() ->
+			{
+				String url = url() + "projects/" + lid;
+				String data = ICurseForge.getPage(url, true);
+				return CurseforgeAPI.$cptr(data, "<div class=\"project-avatar project-avatar-64\"><a href=\"", "\"").substring(1);
+			}));
+		return projectIdToStrMap.get(lid);
 	}
 	
 	@Override

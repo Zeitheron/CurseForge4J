@@ -14,11 +14,13 @@ import com.zeitheron.curseforge.data.FetchableProject;
 
 public interface ICurseForge
 {
+	Fetchable<String> projectIdByLID(long lid);
+	
 	Fetchable<IProject> project(String slug);
 	
-	default Fetchable<IProject> project(long project)
+	default Fetchable<IProject> project(long lid)
 	{
-		return project(project + "");
+		return project(projectIdByLID(lid).get());
 	}
 	
 	Fetchable<IMember> member(String member);

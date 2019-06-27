@@ -21,6 +21,9 @@ public class TestCF
 			prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
 			ICurseForge mc = CurseforgeAPI.www(prefs);
 			
+			// Print newest version of JEI
+			testFileList(mc);
+			
 			System.out.println(mc.member("Ircmaan").get());
 			System.out.println(mc.member("Zeitheron").get());
 			
@@ -36,9 +39,6 @@ public class TestCF
 			
 			// Test Search
 			testSearch(mc);
-			
-			// Print newest version of JEI
-			testFileList(mc);
 		} catch(Throwable err)
 		{
 			err.printStackTrace();
@@ -57,7 +57,7 @@ public class TestCF
 	
 	public static void testFileList(ICurseForge mc)
 	{
-		IProject project = mc.project("minecraft/mc-mods/hammer-lib").get();
+		IProject project = mc.project(320552L).get();
 		
 		System.out.println("Listing all files...");
 		for(int page = 1; page <= project.files().pageCount(); ++page)
