@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import com.zeitheron.curseforge.CurseforgeAPI;
+import com.zeitheron.curseforge.api.threading.ICursedExecutor;
 import com.zeitheron.curseforge.data.CurseForgePrefs;
 import com.zeitheron.curseforge.data.Fetchable;
 import com.zeitheron.curseforge.data.FetchableProject;
@@ -49,6 +50,8 @@ public interface ICurseForge
 	String url();
 	
 	Fetchable<List<String>> rootCategories();
+	
+	ICursedExecutor executor();
 	
 	// Fetchable<List<IGameVersion>> gameVersions();
 	

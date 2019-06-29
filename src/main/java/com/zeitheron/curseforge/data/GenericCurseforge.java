@@ -20,6 +20,8 @@ import com.zeitheron.curseforge.api.IMember;
 import com.zeitheron.curseforge.api.IProject;
 import com.zeitheron.curseforge.api.IProjectList;
 import com.zeitheron.curseforge.api.ISearchResult;
+import com.zeitheron.curseforge.api.threading.ICursedExecutor;
+import com.zeitheron.curseforge.data.threading.GenericCursedExecutor;
 
 public class GenericCurseforge implements ICurseForge
 {
@@ -35,6 +37,19 @@ public class GenericCurseforge implements ICurseForge
 	GenericCurseforge(String game)
 	{
 		this.game = game;
+	}
+	
+	GenericCursedExecutor scheduler;
+	
+	@Override
+	public ICursedExecutor executor()
+	{
+		if(scheduler == null)
+		{
+			scheduler = new GenericCursedExecutor(this);
+			scheduler.init();
+		}
+		return scheduler;
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import com.zeitheron.curseforge.CurseforgeAPI;
 import com.zeitheron.curseforge.api.ICurseForge;
@@ -50,16 +51,22 @@ public class TestCF
 	
 	public static void testSearch(ICurseForge mc)
 	{
-		String query = "Thaumic Additions";
+		String query = "Solar Flux";
 		System.out.println("Searching for \"" + query + "\"");
 		List<FetchableProject> fps = mc.searchProjects(CurseforgeAPI.CATEGORY_MC_MODS, query).getElements();
 		System.out.println("Found " + fps.size() + " elements (page 1):");
-		for(FetchableProject fp : fps)
-		{
+		
+		long start = System.currentTimeMillis();
+		List<IProject> projects = fps.stream().map(f -> f.fetch().get()).collect(Collectors.toList());
+		System.out.println("OLD FETCH ALGORITHM >> " + (System.currentTimeMillis() - start) + " ms.");
+		for(IProject fp : projects)
 			System.out.println(" - " + fp);
-			System.out.println("   - Latest File:");
-			printFileInfo(fp.fetch().get().files().latest().fetch().get(), "     ");
-		}
+		
+		start = System.currentTimeMillis();
+		projects = mc.executor().fetchAndWaitForAll(fps.stream().map(f -> f.fetch()).collect(Collectors.toList()));
+		System.out.println("NEW FETCH ALGORITHM >> " + (System.currentTimeMillis() - start) + " ms.");
+		for(IProject fp : projects)
+			System.out.println(" - " + fp);
 	}
 	
 	public static void testFileList(ICurseForge mc)

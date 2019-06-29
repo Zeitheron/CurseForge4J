@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 public final class CurseForgePrefs
 {
 	private TimeHolder cacheLifespan;
+	private int numFetchThreads;
 	
 	{
 		reset();
@@ -13,11 +14,19 @@ public final class CurseForgePrefs
 	public void reset()
 	{
 		setCacheLifespan(new TimeHolder(5L, TimeUnit.MINUTES));
+		numFetchThreads = Runtime.getRuntime().availableProcessors();
 	}
 	
-	public void setCacheLifespan(TimeHolder cacheLifespan)
+	public CurseForgePrefs setCacheLifespan(TimeHolder cacheLifespan)
 	{
 		this.cacheLifespan = cacheLifespan;
+		return this;
+	}
+	
+	public CurseForgePrefs setNumberOfFetchThreads(int numFetchThreads)
+	{
+		this.numFetchThreads = numFetchThreads;
+		return this;
 	}
 	
 	public TimeHolder getCacheLifespan()
@@ -25,8 +34,14 @@ public final class CurseForgePrefs
 		return cacheLifespan;
 	}
 	
+	public int getNumberOfFetchThreads()
+	{
+		return numFetchThreads;
+	}
+	
 	public void inheritFrom(CurseForgePrefs other)
 	{
 		setCacheLifespan(other.getCacheLifespan());
+		setNumberOfFetchThreads(other.getNumberOfFetchThreads());
 	}
 }
