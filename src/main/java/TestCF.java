@@ -21,12 +21,9 @@ public class TestCF
 			prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
 			ICurseForge mc = CurseforgeAPI.www(prefs);
 			
-			System.out.println(mc.member("Ircmaan").get());
-			System.out.println(mc.member("Zeitheron").get());
+			// Test Search
+			testSearch(mc);
 			
-			for(int i = 0; i < 8; ++i)
-				System.out.println();
-				
 			// Run first iteration - it is going to be slow, since we cache
 			// everything
 			test(mc);
@@ -34,8 +31,14 @@ public class TestCF
 			for(int i = 0; i < 8; ++i)
 				System.out.println();
 			
-			// Test Search
-			testSearch(mc);
+			System.out.println(mc.member("Ircmaan").get());
+			System.out.println(mc.member("Zeitheron").get());
+			
+			for(int i = 0; i < 8; ++i)
+				System.out.println();
+			
+			for(int i = 0; i < 8; ++i)
+				System.out.println();
 			
 			// Print newest version of JEI
 			testFileList(mc);
@@ -47,12 +50,16 @@ public class TestCF
 	
 	public static void testSearch(ICurseForge mc)
 	{
-		String query = "Solar Flux";
+		String query = "Thaumic Additions";
 		System.out.println("Searching for \"" + query + "\"");
-		List<FetchableProject> fps = mc.searchProjects(query).getElements();
+		List<FetchableProject> fps = mc.searchProjects(CurseforgeAPI.CATEGORY_MC_MODS, query).getElements();
 		System.out.println("Found " + fps.size() + " elements (page 1):");
 		for(FetchableProject fp : fps)
+		{
 			System.out.println(" - " + fp);
+			System.out.println("   - Latest File:");
+			printFileInfo(fp.fetch().get().files().latest().fetch().get(), "     ");
+		}
 	}
 	
 	public static void testFileList(ICurseForge mc)
@@ -92,9 +99,6 @@ public class TestCF
 		
 		System.out.println("Latest:");
 		printFileInfo(latest, "  ");
-		
-		System.out.println("Searching for the file... ");
-		System.out.println(mc.searchProjects(latest.md5()).getElements());
 	}
 	
 	private static void printFileInfo(IProjectFile file, String prefix)
@@ -150,10 +154,6 @@ public class TestCF
 		
 		System.out.println("Newest updated project: " + project.description());
 		System.out.println("Latest: ");
-		printFileInfo(project
-				.files()
-				.latest()
-				.fetch()
-				.get(), "  ");
+		printFileInfo(project.files().latest().fetch().get(), "  ");
 	}
 }

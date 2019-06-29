@@ -16,26 +16,28 @@ public class ProjectSearchResult implements ISearchResult<FetchableProject>
 {
 	protected final Fetchable<List<FetchableProject>> projects;
 	protected final ICurseForge cf;
-	protected final String query;
+	protected final String query, category;
 	protected final int page;
 	
 	protected Map<Integer, ProjectSearchResult> inheritance;
 	
-	public ProjectSearchResult(ICurseForge cf, int page, String query)
+	public ProjectSearchResult(ICurseForge cf, int page, String category, String query)
 	{
 		this.cf = cf;
 		this.query = query;
+		this.category = category;
 		this.page = page;
-		this.projects = cf.createFetchable(generator(cf, page, query));
+		this.projects = cf.createFetchable(generator(cf, page, category, query));
 		setInheritance(new HashMap<>());
 	}
 	
-	private ProjectSearchResult(ICurseForge cf, int page, String query, Map<Integer, ProjectSearchResult> inheritance)
+	private ProjectSearchResult(ICurseForge cf, int page, String category, String query, Map<Integer, ProjectSearchResult> inheritance)
 	{
 		this.cf = cf;
 		this.query = query;
+		this.category = category;
 		this.page = page;
-		this.projects = cf.createFetchable(generator(cf, page, query));
+		this.projects = cf.createFetchable(generator(cf, page, category, query));
 		setInheritance(inheritance);
 	}
 	
@@ -69,7 +71,7 @@ public class ProjectSearchResult implements ISearchResult<FetchableProject>
 	{
 		if(inheritance.containsKey(page + 1))
 			return inheritance.get(page + 1);
-		return new ProjectSearchResult(cf, page + 1, query, inheritance);
+		return new ProjectSearchResult(cf, page + 1, category, query, inheritance);
 	}
 	
 	@Override
@@ -77,7 +79,7 @@ public class ProjectSearchResult implements ISearchResult<FetchableProject>
 	{
 		if(inheritance.containsKey(page - 1))
 			return inheritance.get(page - 1);
-		return new ProjectSearchResult(cf, Math.max(1, page - 1), query, inheritance);
+		return new ProjectSearchResult(cf, Math.max(1, page - 1), category, query, inheritance);
 	}
 	
 	@Override
@@ -86,7 +88,7 @@ public class ProjectSearchResult implements ISearchResult<FetchableProject>
 		return cf;
 	}
 	
-	static Supplier<List<FetchableProject>> generator(ICurseForge cf, int page, String query)
+	static Supplier<List<FetchableProject>> generator(ICurseForge cf, int page, String category, String query)
 	{
 		return () ->
 		{
@@ -94,15 +96,17 @@ public class ProjectSearchResult implements ISearchResult<FetchableProject>
 			
 			try
 			{
-				String base = CurseforgeAPI.$cfidg(cf.game()) + "search?search=" + URLEncoder.encode(query, "UTF-8") + "&projects-page=" + page;
+				String base = cf.url() + category + "/search?search=" + URLEncoder.encode(query, "UTF-8") + "&projects-page=" + page;
 				String pg = ICurseForge.getPage(base, true);
 				
-				List<String> trs = CurseforgeAPI.$cptrs(pg, "<tr class=\"results\">", "</tr>");
-				for(String tr : trs)
+				for(String item : CurseforgeAPI.$cptrs(pg, "<div class=\"project-avatar project-avatar-64\">", "</a></div></div></div></div></div>"))
 				{
-					String id = CurseforgeAPI.$cptr(tr, "projectID=", "\"");
-					String name = CurseforgeAPI.$cptr(tr.substring(tr.lastIndexOf(id) - 20), "projectID=" + id + "\">", "</a>");
-					projects.add(new FetchableProject(name, id, null, cf));
+					String slug = CurseforgeAPI.$cptr(item, "<a href=\"/", "\"");
+					String avatar = CurseforgeAPI.$cptr(item, "<img src=\"", "\"");
+					String name = CurseforgeAPI.$cptr(item, "<h3 class=\"text-primary-500 font-bold text-lg hover:no-underline\">", "</h3>");
+					String author = CurseforgeAPI.$cptr(item, "<span>By</span>&nbsp;<a href=\"/members/", "\"");
+					
+					projects.add(new FetchableProject(name, slug, avatar, cf, author));
 				}
 			} catch(UnsupportedEncodingException e)
 			{

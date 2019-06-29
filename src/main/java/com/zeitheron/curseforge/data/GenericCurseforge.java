@@ -173,10 +173,11 @@ public class GenericCurseforge implements ICurseForge
 							{
 								String pr = CurseforgeAPI.$cptr(v, "<a href=\"/", "\"");
 								String avt = CurseforgeAPI.$cptr(v, "<img src=\"", "\" alt");
+								String author = CurseforgeAPI.$cptr(v, "<div class=\"username text-xl\"><a href=\"/members/", "\"");
 								if(!ids.contains(pr))
 								{
 									ids.add(pr);
-									prs.add(new FetchableProject(CurseforgeAPI.$cptr(CurseforgeAPI.$cptr(v, "<h4>", "</h4>"), "\">", "</a>"), pr, avt, this));
+									prs.add(new FetchableProject(CurseforgeAPI.$cptr(CurseforgeAPI.$cptr(v, "<h4>", "</h4>"), "\">", "</a>"), pr, avt, this, author));
 									++added;
 								}
 							}
@@ -216,9 +217,9 @@ public class GenericCurseforge implements ICurseForge
 	}
 	
 	@Override
-	public ISearchResult<FetchableProject> searchProjects(String query)
+	public ISearchResult<FetchableProject> searchProjects(String category, String query)
 	{
-		return new ProjectSearchResult(this, 1, query);
+		return new ProjectSearchResult(this, 1, category, query);
 	}
 	
 	@Override

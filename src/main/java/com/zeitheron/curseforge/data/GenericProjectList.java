@@ -41,8 +41,10 @@ class GenericProjectList implements IProjectList
 			for(String item : CurseforgeAPI.$cptrs(html, "<li class=\"project-list-item\">", "</div></div></li>"))
 			{
 				String name = CurseforgeAPI.$cptr(item, "<div class=\"name-wrapper overflow-tip\"><a href=\"/projects/", "</a></div>");
+				String author = CurseforgeAPI.$cptr(item, "<span>By</span>&nbsp;<a href=\"/members/", "\"");
+				String avatar = CurseforgeAPI.$cptr(item, "<img src=\"", "\"");
 				String[] idName = name.split("\">");
-				ps.add(new FetchableProject(StringUtils.unescapeHtml3(idName[1]), idName[0], null, cf));
+				ps.add(new FetchableProject(StringUtils.unescapeHtml3(idName[1]), idName[0], avatar, cf, author));
 			}
 			return Collections.unmodifiableList(ps);
 		});

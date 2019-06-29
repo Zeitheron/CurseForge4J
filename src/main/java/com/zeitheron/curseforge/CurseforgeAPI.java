@@ -15,16 +15,16 @@ import com.zeitheron.curseforge.data.GenericCurseforge;
 public class CurseforgeAPI
 {
 	public static final String API_VERSION = version();
-	public static final String CATEGORY_MC_MODPACKS = "modpacks";
-	public static final String CATEGORY_MC_CUSTOMIZATION = "customization";
-	public static final String CATEGORY_MC_ADDONS = "mc-addons";
-	public static final String CATEGORY_MC_MODS = "mc-mods";
-	public static final String CATEGORY_MC_TEXTURE_PACKS = "texture-packs";
-	public static final String CATEGORY_MC_WORLDS = "worlds";
+	public static final String CATEGORY_MC_MODPACKS = "minecraft/modpacks";
+	public static final String CATEGORY_MC_CUSTOMIZATION = "minecraft/customization";
+	public static final String CATEGORY_MC_ADDONS = "minecraft/mc-addons";
+	public static final String CATEGORY_MC_MODS = "minecraft/mc-mods";
+	public static final String CATEGORY_MC_TEXTURE_PACKS = "minecraft/texture-packs";
+	public static final String CATEGORY_MC_WORLDS = "minecraft/worlds";
 	
 	public static String version()
 	{
-		return "v1.4.3";
+		return "v1.4.4";
 	}
 	
 	public static ICurseForge www()

@@ -2,6 +2,7 @@ package com.zeitheron.curseforge.api;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
@@ -29,7 +30,7 @@ public interface ICurseForge
 	
 	CurseForgePrefs preferences();
 	
-	ISearchResult<FetchableProject> searchProjects(String query);
+	ISearchResult<FetchableProject> searchProjects(String category, String query);
 	
 	default IProjectList listCategory(String cat)
 	{
@@ -49,11 +50,17 @@ public interface ICurseForge
 	
 	Fetchable<List<String>> rootCategories();
 	
-//	Fetchable<List<IGameVersion>> gameVersions();
+	// Fetchable<List<IGameVersion>> gameVersions();
+	
+	static void setDebug(PrintStream ps)
+	{
+		data.debug = ps;
+	}
 	
 	static String getPage(String url, boolean format)
 	{
-//		System.out.println("GET " + url);
+		if(data.debug != null)
+			data.debug.println("GET " + url);
 		try
 		{
 			HttpURLConnection urlc = (HttpURLConnection) new URL(url).openConnection();
@@ -80,5 +87,10 @@ public interface ICurseForge
 		{
 			return CurseforgeAPI.$ets(e);
 		}
+	}
+	
+	static class data
+	{
+		static PrintStream debug;
 	}
 }

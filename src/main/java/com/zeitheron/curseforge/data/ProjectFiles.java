@@ -52,6 +52,13 @@ public class ProjectFiles
 		return pages.get(id);
 	}
 	
+	public FetchableFile latestNow()
+	{
+		if(pageCount() > 0)
+			return page(1).files().fetchNow().get(0);
+		return null;
+	}
+	
 	public FetchableFile latest()
 	{
 		if(pageCount() > 0)
