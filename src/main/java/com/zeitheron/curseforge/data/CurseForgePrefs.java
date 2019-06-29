@@ -25,6 +25,13 @@ public final class CurseForgePrefs
 		return this;
 	}
 	
+	public CurseForgePrefs multiplyNumberOfFetchThreads(int by)
+	{
+		if(by > 0)
+			this.numFetchThreads *= by;
+		return this;
+	}
+	
 	public CurseForgePrefs setNumberOfFetchThreads(int numFetchThreads)
 	{
 		this.numFetchThreads = numFetchThreads;
