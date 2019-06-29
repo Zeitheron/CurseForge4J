@@ -7,7 +7,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import com.zeitheron.curseforge.api.threading.ICursedExecutor;
+import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.ICursedExecutor;
 import com.zeitheron.curseforge.data.GenericCurseforge;
 import com.zeitheron.curseforge.data.utils.Fetchable;
 
@@ -55,5 +56,11 @@ public class GenericCursedExecutor implements ICursedExecutor
 		for(Callable<T> f : fetchables)
 			futures.add(exec.submit(f));
 		return futures;
+	}
+
+	@Override
+	public ICurseForge curseForge()
+	{
+		return cf;
 	}
 }

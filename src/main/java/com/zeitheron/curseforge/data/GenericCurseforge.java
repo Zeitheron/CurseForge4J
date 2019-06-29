@@ -14,11 +14,11 @@ import java.util.function.Supplier;
 
 import com.zeitheron.curseforge.api.CurseSearchDetails;
 import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.ICursedExecutor;
 import com.zeitheron.curseforge.api.IGame;
 import com.zeitheron.curseforge.api.IMember;
 import com.zeitheron.curseforge.api.IProject;
 import com.zeitheron.curseforge.api.ISearchResult;
-import com.zeitheron.curseforge.api.threading.ICursedExecutor;
 import com.zeitheron.curseforge.data.game.CGame;
 import com.zeitheron.curseforge.data.member.CMember;
 import com.zeitheron.curseforge.data.member.FetchableMember;

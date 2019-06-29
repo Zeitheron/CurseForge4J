@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.zeitheron.curseforge.api.threading.ICursedExecutor;
 import com.zeitheron.curseforge.data.CurseForgePrefs;
 import com.zeitheron.curseforge.data.InternalCFA;
 import com.zeitheron.curseforge.data.project.FetchableProject;
