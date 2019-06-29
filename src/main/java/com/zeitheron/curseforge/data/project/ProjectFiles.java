@@ -1,14 +1,16 @@
-package com.zeitheron.curseforge.data;
+package com.zeitheron.curseforge.data.project;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.zeitheron.curseforge.CurseforgeAPI;
 import com.zeitheron.curseforge.api.ICurseForge;
 import com.zeitheron.curseforge.api.IProject;
-import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
+import com.zeitheron.curseforge.data.InternalCFA;
+import com.zeitheron.curseforge.data.utils.Fetchable;
+import com.zeitheron.curseforge.data.utils.ToStringHelper;
+import com.zeitheron.curseforge.data.utils.ToStringHelper.Ignore;
 
 public class ProjectFiles
 {
@@ -28,7 +30,7 @@ public class ProjectFiles
 		{
 			String str = this.firstPage.get();
 			boolean hasFile = str.contains("/download");
-			List<Integer> ints = CurseforgeAPI.$cptrs(str, "/files/all?page=", "\"").stream().map(Integer::parseInt).collect(Collectors.toList());
+			List<Integer> ints = InternalCFA.$cptrs(str, "/files/all?page=", "\"").stream().map(Integer::parseInt).collect(Collectors.toList());
 			ints.sort((a, b) -> b - a);
 			if(ints.isEmpty() && hasFile)
 				return 1;

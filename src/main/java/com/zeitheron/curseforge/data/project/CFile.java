@@ -1,4 +1,4 @@
-package com.zeitheron.curseforge.data;
+package com.zeitheron.curseforge.data.project;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.zeitheron.curseforge.CurseforgeAPI;
 import com.zeitheron.curseforge.api.ICurseForge;
 import com.zeitheron.curseforge.api.IProject;
 import com.zeitheron.curseforge.api.IProjectFile;
-import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
+import com.zeitheron.curseforge.data.InternalCFA;
+import com.zeitheron.curseforge.data.member.FetchableMember;
+import com.zeitheron.curseforge.data.utils.ToStringHelper;
+import com.zeitheron.curseforge.data.utils.ToStringHelper.Ignore;
 
 public class CFile implements IProjectFile
 {
@@ -141,12 +143,12 @@ public class CFile implements IProjectFile
 		String url = proj.url() + "/files/" + id;
 		String page = ICurseForge.getPage(url, true);
 		
-		String displayName = CurseforgeAPI.$cptr(page, "<h3 class=\"text-primary-500 text-lg\">", "</h3>");
-		String fileName = CurseforgeAPI.$cptr(page, "<div class=\"flex flex-col mr-2\"><span class=\"font-bold text-sm leading-loose mb-1\">Filename</span><span class=\"text-sm\">", "</span></div>");
+		String displayName = InternalCFA.$cptr(page, "<h3 class=\"text-primary-500 text-lg\">", "</h3>");
+		String fileName = InternalCFA.$cptr(page, "<div class=\"flex flex-col mr-2\"><span class=\"font-bold text-sm leading-loose mb-1\">Filename</span><span class=\"text-sm\">", "</span></div>");
 		
 		FetchableMember uploader = null;
 		{
-			String userTag = CurseforgeAPI.$cptr(page, "<div class=\"flex flex-col mr-2\"><span class=\"font-bold text-sm leading-loose mb-1\">Uploaded by</span>", "</span></a></div>");
+			String userTag = InternalCFA.$cptr(page, "<div class=\"flex flex-col mr-2\"><span class=\"font-bold text-sm leading-loose mb-1\">Uploaded by</span>", "</span></a></div>");
 			for(FetchableMember pm : proj.membersList())
 				if(userTag.contains(pm.name()))
 				{
@@ -155,22 +157,22 @@ public class CFile implements IProjectFile
 				}
 		}
 		
-		String downloadsStr = CurseforgeAPI.$cptr(page, "<span class=\"font-bold text-sm leading-loose mb-1\">Downloads</span><span class=\"text-sm\">", "</span>");
+		String downloadsStr = InternalCFA.$cptr(page, "<span class=\"font-bold text-sm leading-loose mb-1\">Downloads</span><span class=\"text-sm\">", "</span>");
 		long downloads = Long.parseLong(downloadsStr.replaceAll(",", "").replaceAll(" ", ""));
 		
-		String md5 = CurseforgeAPI.$cptr(page, "<div class=\"flex flex-col\"><span class=\"font-bold text-sm leading-loose mb-1\">MD5</span><span class=\"text-sm\">", "</span>");
+		String md5 = InternalCFA.$cptr(page, "<div class=\"flex flex-col\"><span class=\"font-bold text-sm leading-loose mb-1\">MD5</span><span class=\"text-sm\">", "</span>");
 		
-		Date uploaded = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Uploaded</div>", "</abbr></div>"));
+		Date uploaded = InternalCFA.$abbr(InternalCFA.$cptr(page, "<div class=\"info-label\">Uploaded</div>", "</abbr></div>"));
 		
 		List<String> fis = new ArrayList<>();
 		
-		String add = CurseforgeAPI.$cptr(page, "<table class=\"listing listing-project-file", "</tbody></table>");
+		String add = InternalCFA.$cptr(page, "<table class=\"listing listing-project-file", "</tbody></table>");
 		if(add != null)
-			fis.addAll(CurseforgeAPI.$cptrs(add, "/download/", "\""));
+			fis.addAll(InternalCFA.$cptrs(add, "/download/", "\""));
 		fis.removeIf(s -> s.contains("?"));
 		
-		String changelog = CurseforgeAPI.$rlnk(CurseforgeAPI.$cptr(page, "<h4 class=\"font-bold text-sm mb-2\">Changelog</h4><div class=\"bg-accent rounded py-1 pl-1 border-primary-100 border text-gray-500\"><div class=\"user-content min max-h-60 overflow-auto block\">", "</div></div></div>"));
-		String size = CurseforgeAPI.$cptr(page, "<div class=\"flex flex-col mr-2\"><span class=\"font-bold text-sm leading-loose mb-1\">Size</span><span class=\"text-sm\">", "</span>");
+		String changelog = InternalCFA.$rlnk(InternalCFA.$cptr(page, "<h4 class=\"font-bold text-sm mb-2\">Changelog</h4><div class=\"bg-accent rounded py-1 pl-1 border-primary-100 border text-gray-500\"><div class=\"user-content min max-h-60 overflow-auto block\">", "</div></div></div>"));
+		String size = InternalCFA.$cptr(page, "<div class=\"flex flex-col mr-2\"><span class=\"font-bold text-sm leading-loose mb-1\">Size</span><span class=\"text-sm\">", "</span>");
 		
 		return new CFile(proj, id, displayName == null || displayName.isEmpty() ? fileName : displayName, fileName, md5, uploaded, downloads, fis, uploader, changelog, size);
 	}

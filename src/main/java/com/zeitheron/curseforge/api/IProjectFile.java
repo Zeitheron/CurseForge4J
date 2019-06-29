@@ -3,8 +3,8 @@ package com.zeitheron.curseforge.api;
 import java.util.Date;
 import java.util.List;
 
-import com.zeitheron.curseforge.data.FetchableFile;
-import com.zeitheron.curseforge.data.FetchableMember;
+import com.zeitheron.curseforge.data.member.FetchableMember;
+import com.zeitheron.curseforge.data.project.FetchableFile;
 
 public interface IProjectFile
 {

@@ -2,15 +2,19 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.zeitheron.curseforge.CurseforgeAPI;
+import com.zeitheron.curseforge.api.CurseForgeAPI;
+import com.zeitheron.curseforge.api.CurseSearchDetails;
 import com.zeitheron.curseforge.api.ICurseForge;
+import com.zeitheron.curseforge.api.IGame;
+import com.zeitheron.curseforge.api.IGameCategory;
 import com.zeitheron.curseforge.api.IMember;
 import com.zeitheron.curseforge.api.IProject;
 import com.zeitheron.curseforge.api.IProjectFile;
 import com.zeitheron.curseforge.data.CurseForgePrefs;
-import com.zeitheron.curseforge.data.FetchableFile;
-import com.zeitheron.curseforge.data.FetchableProject;
-import com.zeitheron.curseforge.data.TimeHolder;
+import com.zeitheron.curseforge.data.InternalCFA;
+import com.zeitheron.curseforge.data.project.FetchableFile;
+import com.zeitheron.curseforge.data.project.FetchableProject;
+import com.zeitheron.curseforge.data.utils.TimeHolder;
 
 public class TestCF
 {
@@ -20,7 +24,7 @@ public class TestCF
 		{
 			CurseForgePrefs prefs = new CurseForgePrefs();
 			prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
-			ICurseForge mc = CurseforgeAPI.www(prefs);
+			ICurseForge mc = CurseForgeAPI.create(prefs);
 			
 			// Test Search
 			testSearch(mc);
@@ -43,6 +47,13 @@ public class TestCF
 			
 			// Print newest version of JEI
 			testFileList(mc);
+			
+			for(IGame game : mc.allGames().get())
+			{
+				System.out.println(game.name() + ":");
+				for(IGameCategory cat : game.categories().get())
+					System.out.println(" - " + cat);
+			}
 		} catch(Throwable err)
 		{
 			err.printStackTrace();
@@ -52,21 +63,15 @@ public class TestCF
 	public static void testSearch(ICurseForge mc)
 	{
 		String query = "Solar Flux";
-		System.out.println("Searching for \"" + query + "\"");
-		List<FetchableProject> fps = mc.searchProjects(CurseforgeAPI.CATEGORY_MC_MODS, query).getElements();
+		System.out.println("Searching for \"" + query + "\" in " + mc.gameById("minecraft").categoryById("mc-mods"));
+		List<FetchableProject> fps = mc.searchProjects(new CurseSearchDetails(mc.gameById("minecraft"), mc.gameById("minecraft").categoryById("mc-mods")), query).getElements();
 		System.out.println("Found " + fps.size() + " elements (page 1):");
 		
 		long start = System.currentTimeMillis();
-		List<IProject> projects = fps.stream().map(f -> f.fetch().get()).collect(Collectors.toList());
-		System.out.println("OLD FETCH ALGORITHM >> " + (System.currentTimeMillis() - start) + " ms.");
-		for(IProject fp : projects)
-			System.out.println(" - " + fp);
-		
-		start = System.currentTimeMillis();
-		projects = mc.executor().fetchAndWaitForAll(fps.stream().map(f -> f.fetch()).collect(Collectors.toList()));
+		List<IProject> projects = mc.executor().fetchAndWaitForAll(fps.stream().map(f -> f.fetch()).collect(Collectors.toList()));
 		System.out.println("NEW FETCH ALGORITHM >> " + (System.currentTimeMillis() - start) + " ms.");
 		for(IProject fp : projects)
-			System.out.println(" - " + fp);
+			System.out.println(" - " + fp.description());
 	}
 	
 	public static void testFileList(ICurseForge mc)
@@ -139,16 +144,16 @@ public class TestCF
 		System.out.println("Followers: " + member.followers() + " " + member.followerList());
 		System.out.println("Posts: " + member.posts().total() + " Total");
 		System.out.println("Thanks: " + member.thanks().total() + " Total - " + member.thanks().received() + " received, " + member.thanks().given() + " given.");
-		System.out.println("Projects: " + member.projects().size());
+		System.out.println("Projects: " + member.projects().get().size());
 		
 		int i = 0;
-		for(FetchableProject proj : member.projects())
+		for(FetchableProject proj : member.projects().get())
 		{
 			System.out.println("- " + proj);
 			++i;
 			if(i >= 4)
 			{
-				System.out.println("-- " + (member.projects().size() - i) + " more");
+				System.out.println("-- " + (member.projects().get().size() - i) + " more");
 				break;
 			}
 		}
@@ -157,7 +162,7 @@ public class TestCF
 		System.out.println("------------------------------------------");
 		System.out.println();
 		
-		IProject project = member.projects().get(0).fetch().get();
+		IProject project = member.projects().get().get(0).fetch().get();
 		
 		System.out.println("Newest updated project: " + project.description());
 		System.out.println("Latest: ");

@@ -1,4 +1,6 @@
-package com.zeitheron.curseforge.data;
+package com.zeitheron.curseforge.data.member;
+
+import com.zeitheron.curseforge.data.utils.ToStringHelper;
 
 public class MemberPosts
 {

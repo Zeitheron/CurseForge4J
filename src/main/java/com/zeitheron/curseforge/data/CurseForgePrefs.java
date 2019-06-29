@@ -2,6 +2,8 @@ package com.zeitheron.curseforge.data;
 
 import java.util.concurrent.TimeUnit;
 
+import com.zeitheron.curseforge.data.utils.TimeHolder;
+
 public final class CurseForgePrefs
 {
 	private TimeHolder cacheLifespan;

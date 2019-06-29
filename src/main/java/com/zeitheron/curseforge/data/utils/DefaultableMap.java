@@ -1,4 +1,4 @@
-package com.zeitheron.curseforge.data;
+package com.zeitheron.curseforge.data.utils;
 
 import java.util.HashMap;
 import java.util.function.Function;

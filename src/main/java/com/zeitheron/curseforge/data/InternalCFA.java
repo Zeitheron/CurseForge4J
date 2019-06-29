@@ -1,4 +1,4 @@
-package com.zeitheron.curseforge;
+package com.zeitheron.curseforge.data;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
@@ -9,32 +9,17 @@ import java.util.Date;
 import java.util.List;
 
 import com.zeitheron.curseforge.api.ICurseForge;
-import com.zeitheron.curseforge.data.CurseForgePrefs;
-import com.zeitheron.curseforge.data.GenericCurseforge;
 
-public class CurseforgeAPI
+public class InternalCFA
 {
-	public static final String API_VERSION = version();
-	public static final String CATEGORY_MC_MODPACKS = "minecraft/modpacks";
-	public static final String CATEGORY_MC_CUSTOMIZATION = "minecraft/customization";
-	public static final String CATEGORY_MC_ADDONS = "minecraft/mc-addons";
-	public static final String CATEGORY_MC_MODS = "minecraft/mc-mods";
-	public static final String CATEGORY_MC_TEXTURE_PACKS = "minecraft/texture-packs";
-	public static final String CATEGORY_MC_WORLDS = "minecraft/worlds";
-	
 	public static String version()
 	{
-		return "v1.4.5";
-	}
-	
-	public static ICurseForge www()
-	{
-		return $.create(GenericCurseforge.class, "www");
+		return "v1.5.1";
 	}
 	
 	public static ICurseForge www(CurseForgePrefs prefs)
 	{
-		ICurseForge cf = $.create(GenericCurseforge.class, "www");
+		ICurseForge cf = $.create(GenericCurseforge.class);
 		cf.preferences().inheritFrom(prefs);
 		return cf;
 	}

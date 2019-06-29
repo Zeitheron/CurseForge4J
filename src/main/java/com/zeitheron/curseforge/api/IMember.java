@@ -3,9 +3,10 @@ package com.zeitheron.curseforge.api;
 import java.util.Date;
 import java.util.List;
 
-import com.zeitheron.curseforge.data.MemberPosts;
-import com.zeitheron.curseforge.data.MemberThanks;
-import com.zeitheron.curseforge.data.FetchableProject;
+import com.zeitheron.curseforge.data.member.MemberPosts;
+import com.zeitheron.curseforge.data.member.MemberThanks;
+import com.zeitheron.curseforge.data.project.FetchableProject;
+import com.zeitheron.curseforge.data.utils.Fetchable;
 
 public interface IMember
 {
@@ -23,7 +24,7 @@ public interface IMember
 	
 	MemberPosts posts();
 	
-	List<FetchableProject> projects();
+	Fetchable<List<FetchableProject>> projects();
 	
 	List<String> followerList();
 	

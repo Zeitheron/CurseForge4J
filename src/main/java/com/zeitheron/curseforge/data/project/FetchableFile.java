@@ -1,10 +1,13 @@
-package com.zeitheron.curseforge.data;
+package com.zeitheron.curseforge.data.project;
 
 import com.zeitheron.curseforge.api.IProject;
 import com.zeitheron.curseforge.api.IProjectFile;
-import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
+import com.zeitheron.curseforge.api.IQFetchable;
+import com.zeitheron.curseforge.data.utils.Fetchable;
+import com.zeitheron.curseforge.data.utils.ToStringHelper;
+import com.zeitheron.curseforge.data.utils.ToStringHelper.Ignore;
 
-public class FetchableFile
+public class FetchableFile implements IQFetchable<IProjectFile>
 {
 	protected final String id;
 	protected final IProject project;
@@ -18,6 +21,7 @@ public class FetchableFile
 		this.file = project.curseForge().createFetchable(() -> CFile.create(project, id));
 	}
 	
+	@Override
 	public Fetchable<IProjectFile> fetch()
 	{
 		return file;

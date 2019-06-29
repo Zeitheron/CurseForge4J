@@ -12,32 +12,32 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import com.zeitheron.curseforge.CurseforgeAPI;
-import com.zeitheron.curseforge.api.EnumSortRule;
+import com.zeitheron.curseforge.api.CurseSearchDetails;
 import com.zeitheron.curseforge.api.ICurseForge;
-import com.zeitheron.curseforge.api.IGameVersion;
+import com.zeitheron.curseforge.api.IGame;
 import com.zeitheron.curseforge.api.IMember;
 import com.zeitheron.curseforge.api.IProject;
-import com.zeitheron.curseforge.api.IProjectList;
 import com.zeitheron.curseforge.api.ISearchResult;
 import com.zeitheron.curseforge.api.threading.ICursedExecutor;
+import com.zeitheron.curseforge.data.game.CGame;
+import com.zeitheron.curseforge.data.member.CMember;
+import com.zeitheron.curseforge.data.member.FetchableMember;
+import com.zeitheron.curseforge.data.member.MemberPosts;
+import com.zeitheron.curseforge.data.member.MemberThanks;
+import com.zeitheron.curseforge.data.project.CProject;
+import com.zeitheron.curseforge.data.project.FetchableProject;
+import com.zeitheron.curseforge.data.project.ProjectSearchResult;
 import com.zeitheron.curseforge.data.threading.GenericCursedExecutor;
+import com.zeitheron.curseforge.data.utils.Fetchable;
 
 public class GenericCurseforge implements ICurseForge
 {
 	static final SimpleDateFormat SDF1 = new SimpleDateFormat("MM/dd/yyyy");
-	final String game;
 	final CurseForgePrefs prefs = new CurseForgePrefs();
 	final Map<String, Fetchable<IProject>> projectCache = new HashMap<>();
 	final Map<String, Fetchable<IMember>> memberCache = new HashMap<>();
 	final Map<Long, Fetchable<String>> projectIdToStrMap = new HashMap<>();
-	final DefaultableMap<String, HashMap<Integer, GenericProjectList>> listStorage = new DefaultableMap<>(s -> new HashMap<>());
-	Fetchable<List<String>> rootCats;
-	
-	GenericCurseforge(String game)
-	{
-		this.game = game;
-	}
+	Fetchable<List<IGame>> games;
 	
 	GenericCursedExecutor scheduler;
 	
@@ -60,7 +60,7 @@ public class GenericCurseforge implements ICurseForge
 			{
 				String url = url() + "projects/" + lid;
 				String data = ICurseForge.getPage(url, true);
-				return CurseforgeAPI.$cptr(data, "<div class=\"project-avatar project-avatar-64\"><a href=\"", "\"").substring(1);
+				return InternalCFA.$cptr(data, "<div class=\"project-avatar project-avatar-64\"><a href=\"", "\"").substring(1);
 			}));
 		return projectIdToStrMap.get(lid);
 	}
@@ -75,38 +75,38 @@ public class GenericCurseforge implements ICurseForge
 				
 				String page = ICurseForge.getPage(url, true);
 				
-				String name = CurseforgeAPI.$cptr(page, "<meta property=\"og:title\" content=\"", "\"");
+				String name = InternalCFA.$cptr(page, "<meta property=\"og:title\" content=\"", "\"");
 				if(name == null)
 					return null;
 				
-				String overview = CurseforgeAPI.$cptr(page, "<meta property=\"og:description\" content=\"", "\"");
+				String overview = InternalCFA.$cptr(page, "<meta property=\"og:description\" content=\"", "\"");
 				if(overview == null)
 					return null;
 				
 				String avatar = null, thumbnail = null;
 				{
-					String avs = CurseforgeAPI.$cptr(page, "<div class=\"project-avatar project-avatar-64\">", "</a></div>");
-					avatar = CurseforgeAPI.$cptr(avs, "data-featherlight=\"", "\">");
-					thumbnail = CurseforgeAPI.$cptr(avs, "<img src=\"", "\"");
+					String avs = InternalCFA.$cptr(page, "<div class=\"project-avatar project-avatar-64\">", "</a></div>");
+					avatar = InternalCFA.$cptr(avs, "data-featherlight=\"", "\">");
+					thumbnail = InternalCFA.$cptr(avs, "<img src=\"", "\"");
 				}
 				
-				String desc = CurseforgeAPI.$cptr(page, "<section class=\"flex flex-col project-detail\"><div class=\"box p-4 pb-2 project-detail__content\" data-user-content>", "</div><div class=\"mt-6\"></div></section>");
+				String desc = InternalCFA.$cptr(page, "<div class=\"box p-4 pb-2 project-detail__content\" data-user-content>", "</div><div class=\"mt-6\">");
 				
-				long projectId = Long.parseLong(CurseforgeAPI.$cptr(page, "<span>Project ID</span><span>", "</span>"));
+				long projectId = Long.parseLong(InternalCFA.$cptr(page, "<span>Project ID</span><span>", "</span>"));
 				
-				Date created = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Created </div><div class=\"info-data\"><abbr", "</abbr>"));
-				Date lastUpdate = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "<div class=\"info-label\">Last Released File</div><div class=\"info-data\"><abbr", "</abbr>"));
-				long totalDownloads = Long.parseLong(CurseforgeAPI.$cptr(page, "<span>Total Downloads</span><span>", "</span>").replaceAll(",", ""));
+				Date created = InternalCFA.$abbr(InternalCFA.$cptr(page, "<div class=\"info-label\">Created </div><div class=\"info-data\"><abbr", "</abbr>"));
+				Date lastUpdate = InternalCFA.$abbr(InternalCFA.$cptr(page, "<div class=\"info-label\">Last Released File</div><div class=\"info-data\"><abbr", "</abbr>"));
+				long totalDownloads = Long.parseLong(InternalCFA.$cptr(page, "<span>Total Downloads</span><span>", "</span>").replaceAll(",", ""));
 				
 				List<FetchableMember> members = new ArrayList<>();
 				{
-					String rawMembers = CurseforgeAPI.$cptr(page, "<h3 class=\"font-bold mb-3 text-lg\">Members</h3>", "</div></div></div></div>") + "</div></div></div></div>";
+					String rawMembers = InternalCFA.$cptr(page, "<h3 class=\"font-bold mb-3 text-lg\">Members</h3>", "</div></div></div></div>") + "</div></div></div></div>";
 					
-					for(String member : CurseforgeAPI.$cptrs(rawMembers, "<div class=\"flex mb-2\">", "</div></div>"))
+					for(String member : InternalCFA.$cptrs(rawMembers, "<div class=\"flex mb-2\">", "</div></div>"))
 					{
-						String msl = CurseforgeAPI.$cptr(member, "<a href=\"/members/", "\">");
-						String mname = CurseforgeAPI.$cptr(member, "<a href=\"/members/" + msl + "\"><span>", "</span></a>");
-						String mrole = CurseforgeAPI.$cptr(member, "<p class=\"text-xs\">", "</p>");
+						String msl = InternalCFA.$cptr(member, "<a href=\"/members/", "\">");
+						String mname = InternalCFA.$cptr(member, "<a href=\"/members/" + msl + "\"><span>", "</span></a>");
+						String mrole = InternalCFA.$cptr(member, "<p class=\"text-xs\">", "</p>");
 						members.add(new FetchableMember(mname, mrole, this));
 					}
 				}
@@ -116,7 +116,7 @@ public class GenericCurseforge implements ICurseForge
 				String rootGame = data[0];
 				String rootGameCategory = data[1];
 				
-				return new CProject(name, overview, CurseforgeAPI.$rlnk(desc), avatar, thumbnail, created, lastUpdate, projectId, totalDownloads, members, this, url, rootGameCategory, rootGame);
+				return new CProject(name, overview, InternalCFA.$rlnk(desc), avatar, thumbnail, created, lastUpdate, projectId, totalDownloads, members, this, url, rootGameCategory, rootGame);
 			}));
 		return projectCache.get(project.toLowerCase());
 	}
@@ -132,13 +132,13 @@ public class GenericCurseforge implements ICurseForge
 				String base = url() + "members/" + member.toLowerCase();
 				String page = ICurseForge.getPage(base + "/projects", true);
 				
-				String name = CurseforgeAPI.$cptr(page, "<div class=\"username text-xl\">", "</div>");
+				String name = InternalCFA.$cptr(page, "<div class=\"username text-xl\">", "</div>");
 				
 				if(name == null)
 					return null;
 				
-				String registeredUserIcon = CurseforgeAPI.$cptr(page, "<div class=\"user-avatar pr-5\">", "</div></div>");
-				String avatar = CurseforgeAPI.$cptr(registeredUserIcon.toLowerCase(), "<a href=\"/members/" + name.toLowerCase() + "\"><img ", "</a>");
+				String registeredUserIcon = InternalCFA.$cptr(page, "<div class=\"user-avatar pr-5\">", "</div></div>");
+				String avatar = InternalCFA.$cptr(registeredUserIcon.toLowerCase(), "<a href=\"/members/" + name.toLowerCase() + "\"><img ", "</a>");
 				if(avatar != null)
 				{
 					int start = avatar.indexOf("src=\"") + 5;
@@ -148,7 +148,7 @@ public class GenericCurseforge implements ICurseForge
 					avatar = registeredUserIcon.substring(io, io + avatar.length());
 					online = registeredUserIcon.contains("<i class=\"u-icon u-icon-online\"></i>");
 				}
-				String memberSince = CurseforgeAPI.$cptr(page, "Member Since: ", "\">");
+				String memberSince = InternalCFA.$cptr(page, "Member Since: ", "\">");
 				Date registerDate = null;
 				
 				try
@@ -159,17 +159,17 @@ public class GenericCurseforge implements ICurseForge
 					e.printStackTrace();
 				}
 				
-				Date lastActive = CurseforgeAPI.$abbr(CurseforgeAPI.$cptr(page, "Last active <abbr class=\"tip standard-datetime-precise\" title=\"", "\">"));
+				Date lastActive = InternalCFA.$abbr(InternalCFA.$cptr(page, "Last active <abbr class=\"tip standard-datetime-precise\" title=\"", "\">"));
 				
-				String followersStr = CurseforgeAPI.$cptr(page, "<div class=\"followers w-1/3 border-r text-center p-3 border-gray--100\"><span>", "</span>");
+				String followersStr = InternalCFA.$cptr(page, "<div class=\"followers w-1/3 border-r text-center p-3 border-gray--100\"><span>", "</span>");
 				long followers = Long.parseLong(followersStr.split(" ")[0]);
 				
-				String postsStr = CurseforgeAPI.$cptr(page, "<div class=\"posts w-1/3 border-r text-center p-3 border-gray--100\"><span class=\"tip\" title=\"(", "\">");
+				String postsStr = InternalCFA.$cptr(page, "<div class=\"posts w-1/3 border-r text-center p-3 border-gray--100\"><span class=\"tip\" title=\"(", "\">");
 				String[] postMeta$ = postsStr.split(", ");
 				long comments = Long.parseLong(postMeta$[0].split(" ")[0].substring(1));
 				long forumPosts = Long.parseLong(postMeta$[1].split(" ")[0]);
 				
-				String likesStr = CurseforgeAPI.$cptr(page, "<div class=\"likes w-1/3 text-center p-3 border-gray--100\"><span class=\"tip\" title=\"(", ")\">");
+				String likesStr = InternalCFA.$cptr(page, "<div class=\"likes w-1/3 text-center p-3 border-gray--100\"><span class=\"tip\" title=\"(", ")\">");
 				String[] likeMeta$ = likesStr.split(", ");
 				long th_rcv = Long.parseLong(likeMeta$[0].split(" ")[0]);
 				long th_gvn = Long.parseLong(likeMeta$[1].split(" ")[0]);
@@ -184,15 +184,15 @@ public class GenericCurseforge implements ICurseForge
 						String pg = ICurseForge.getPage(base + "/projects?page=" + i, true);
 						int added = 0;
 						{
-							for(String v : CurseforgeAPI.$cptrs(pg, "<li class=\"latest-post-item project-list-bubble-item\">", "</figure></div></div></li>"))
+							for(String v : InternalCFA.$cptrs(pg, "<li class=\"latest-post-item project-list-bubble-item\">", "</figure></div></div></li>"))
 							{
-								String pr = CurseforgeAPI.$cptr(v, "<a href=\"/", "\"");
-								String avt = CurseforgeAPI.$cptr(v, "<img src=\"", "\" alt");
-								String author = CurseforgeAPI.$cptr(v, "<div class=\"username text-xl\"><a href=\"/members/", "\"");
+								String pr = InternalCFA.$cptr(v, "<a href=\"/", "\"");
+								String avt = InternalCFA.$cptr(v, "<img src=\"", "\" alt");
+								String author = InternalCFA.$cptr(v, "<div class=\"username text-xl\"><a href=\"/members/", "\"");
 								if(!ids.contains(pr))
 								{
 									ids.add(pr);
-									prs.add(new FetchableProject(CurseforgeAPI.$cptr(CurseforgeAPI.$cptr(v, "<h4>", "</h4>"), "\">", "</a>"), pr, avt, this, author));
+									prs.add(new FetchableProject(InternalCFA.$cptr(InternalCFA.$cptr(v, "<h4>", "</h4>"), "\">", "</a>"), pr, avt, this, author));
 									++added;
 								}
 							}
@@ -208,7 +208,7 @@ public class GenericCurseforge implements ICurseForge
 				Supplier<List<String>> followerList = () ->
 				{
 					String txt = ICurseForge.getPage(base + "/followers", true).toLowerCase();
-					Set<String> located = new HashSet<>(CurseforgeAPI.$cptrs(txt, "<a href=\"/members/", "\""));
+					Set<String> located = new HashSet<>(InternalCFA.$cptrs(txt, "<a href=\"/members/", "\""));
 					located.removeIf(s -> s.contains("/"));
 					located.remove(member.toLowerCase());
 					return Collections.unmodifiableList(new ArrayList<>(located));
@@ -220,32 +220,15 @@ public class GenericCurseforge implements ICurseForge
 	}
 	
 	@Override
-	public String game()
-	{
-		return game;
-	}
-	
-	@Override
 	public CurseForgePrefs preferences()
 	{
 		return prefs;
 	}
 	
 	@Override
-	public ISearchResult<FetchableProject> searchProjects(String category, String query)
+	public ISearchResult<FetchableProject> searchProjects(CurseSearchDetails details, String query)
 	{
-		return new ProjectSearchResult(this, 1, category, query);
-	}
-	
-	@Override
-	public IProjectList listCategory(String cat, EnumSortRule sort, IGameVersion version)
-	{
-		if(version == null)
-			version = IGameVersion.NULL;
-		HashMap<Integer, GenericProjectList> thisList = listStorage.get(version.toString());
-		if(!thisList.containsKey(1))
-			thisList.put(1, new GenericProjectList(cat, 1, sort, listStorage, this, version));
-		return thisList.get(1);
+		return new ProjectSearchResult(this, 1, details, query);
 	}
 	
 	@Override
@@ -257,18 +240,38 @@ public class GenericCurseforge implements ICurseForge
 	@Override
 	public String url()
 	{
-		return CurseforgeAPI.$cfidg(game());
+		return InternalCFA.$cfidg("www");
 	}
 	
 	@Override
-	public Fetchable<List<String>> rootCategories()
+	public IGame gameById(String id)
 	{
-		if(rootCats == null)
-			rootCats = createFetchable(() ->
+		for(IGame game : allGames().get())
+			if(game.id().equalsIgnoreCase(id))
+				return game;
+		return null;
+	}
+	
+	@Override
+	public Fetchable<List<IGame>> allGames()
+	{
+		if(games == null)
+			games = createFetchable(() ->
 			{
-				String page = ICurseForge.getPage(url() + "projects", true);
-				return Collections.unmodifiableList(CurseforgeAPI.$cptrs(page, "<div class=\"project-category\"><a class=\"project-icon\" href=\"/", "\""));
+				List<IGame> games = new ArrayList<>();
+				
+				String page = ICurseForge.getPage(url() + "all-games", true);
+				
+				for(String str : InternalCFA.$cptrs(page, "<div class=\"flex-steady py-2 max-w-half w-1/3 flex-wrap md:w-1/6 px-2\"><a href=\"", "</article>"))
+				{
+					String gameId = InternalCFA.$cptr(str, "/", "\"");
+					String coverImage = InternalCFA.$cptr(str, "<img class=\"absolute inset-0 h-full w-full block\" src=\"", "\"");
+					String gameName = InternalCFA.$cptr(str, "<div class=\"flex flex-col\"><p>", "</p>");
+					games.add(new CGame(gameId, gameName, coverImage, this));
+				}
+				
+				return Collections.unmodifiableList(games);
 			});
-		return rootCats;
+		return games;
 	}
 }

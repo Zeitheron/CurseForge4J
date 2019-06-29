@@ -1,4 +1,4 @@
-package com.zeitheron.curseforge.data;
+package com.zeitheron.curseforge.data.project;
 
 import java.util.Collections;
 import java.util.Date;
@@ -6,7 +6,9 @@ import java.util.List;
 
 import com.zeitheron.curseforge.api.ICurseForge;
 import com.zeitheron.curseforge.api.IProject;
-import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
+import com.zeitheron.curseforge.data.member.FetchableMember;
+import com.zeitheron.curseforge.data.utils.ToStringHelper;
+import com.zeitheron.curseforge.data.utils.ToStringHelper.Ignore;
 
 public class CProject implements IProject
 {

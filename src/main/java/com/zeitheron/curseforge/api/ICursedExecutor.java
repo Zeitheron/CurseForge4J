@@ -2,10 +2,13 @@ package com.zeitheron.curseforge.api.threading;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
-import com.zeitheron.curseforge.data.Fetchable;
+import com.zeitheron.curseforge.api.IQFetchable;
+import com.zeitheron.curseforge.data.utils.Fetchable;
 
 public interface ICursedExecutor
 {
@@ -13,9 +16,21 @@ public interface ICursedExecutor
 	
 	<T> List<Future<T>> fetchAll(Iterable<Fetchable<T>> fetchables);
 	
+	<T> List<Future<T>> fetchAllCall(Iterable<Callable<T>> fetchables);
+	
 	default <T> List<T> fetchAndWaitForAll(Iterable<Fetchable<T>> fetchables)
 	{
 		return waitForAll(fetchAll(fetchables));
+	}
+	
+	default <T> List<T> fetchAndWaitForAllCall(Iterable<Callable<T>> fetchables)
+	{
+		return waitForAll(fetchAllCall(fetchables));
+	}
+	
+	default <T> List<T> qfetch(List<IQFetchable<T>> projects)
+	{
+		return fetchAndWaitForAll(projects.stream().map(f -> f.fetch()).collect(Collectors.toList()));
 	}
 	
 	@SuppressWarnings("unchecked")

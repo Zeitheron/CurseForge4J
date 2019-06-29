@@ -6,13 +6,14 @@ import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import com.zeitheron.curseforge.CurseforgeAPI;
 import com.zeitheron.curseforge.api.threading.ICursedExecutor;
 import com.zeitheron.curseforge.data.CurseForgePrefs;
-import com.zeitheron.curseforge.data.Fetchable;
-import com.zeitheron.curseforge.data.FetchableProject;
+import com.zeitheron.curseforge.data.InternalCFA;
+import com.zeitheron.curseforge.data.project.FetchableProject;
+import com.zeitheron.curseforge.data.utils.Fetchable;
 
 public interface ICurseForge
 {
@@ -27,31 +28,19 @@ public interface ICurseForge
 	
 	Fetchable<IMember> member(String member);
 	
-	String game();
-	
 	CurseForgePrefs preferences();
 	
-	ISearchResult<FetchableProject> searchProjects(String category, String query);
-	
-	default IProjectList listCategory(String cat)
-	{
-		return listCategory(cat, EnumSortRule.POPULARITY);
-	}
-	
-	default IProjectList listCategory(String cat, EnumSortRule sort)
-	{
-		return listCategory(cat, sort, null);
-	}
-	
-	IProjectList listCategory(String cat, EnumSortRule sort, IGameVersion version);
+	ISearchResult<FetchableProject> searchProjects(CurseSearchDetails details, String query);
 	
 	<T> Fetchable<T> createFetchable(Supplier<T> get);
 	
 	String url();
 	
-	Fetchable<List<String>> rootCategories();
-	
 	ICursedExecutor executor();
+	
+	IGame gameById(String id);
+	
+	Fetchable<List<IGame>> allGames();
 	
 	// Fetchable<List<IGameVersion>> gameVersions();
 	
@@ -61,6 +50,11 @@ public interface ICurseForge
 	}
 	
 	static String getPage(String url, boolean format)
+	{
+		return getPage(url, format, null);
+	}
+	
+	static String getPage(String url, boolean format, Consumer<String> inp)
 	{
 		if(data.debug != null)
 			data.debug.println("GET " + url);
@@ -75,6 +69,8 @@ public interface ICurseForge
 			int read = 0;
 			while((read = in.read(buf)) > 0)
 				reader.append(new String(buf, 0, read));
+			if(inp != null)
+				inp.accept(urlc.getURL().toString());
 			in.close();
 			if(format)
 			{
@@ -88,7 +84,24 @@ public interface ICurseForge
 			return reader.toString();
 		} catch(IOException e)
 		{
-			return CurseforgeAPI.$ets(e);
+			return InternalCFA.$ets(e);
+		}
+	}
+	
+	static String getPath(String url)
+	{
+		if(data.debug != null)
+			data.debug.println("GET PATH " + url);
+		try
+		{
+			HttpURLConnection urlc = (HttpURLConnection) new URL(url).openConnection();
+			urlc.setRequestProperty("User-Agent", "Zeitheron JCF");
+			urlc.setInstanceFollowRedirects(true);
+			urlc.connect();
+			return urlc.getURL().toString();
+		} catch(IOException e)
+		{
+			return InternalCFA.$ets(e);
 		}
 	}
 	

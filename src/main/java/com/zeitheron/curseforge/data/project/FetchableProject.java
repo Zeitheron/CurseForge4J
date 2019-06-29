@@ -1,10 +1,13 @@
-package com.zeitheron.curseforge.data;
+package com.zeitheron.curseforge.data.project;
 
 import com.zeitheron.curseforge.api.ICurseForge;
 import com.zeitheron.curseforge.api.IProject;
-import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
+import com.zeitheron.curseforge.api.IQFetchable;
+import com.zeitheron.curseforge.data.utils.Fetchable;
+import com.zeitheron.curseforge.data.utils.ToStringHelper;
+import com.zeitheron.curseforge.data.utils.ToStringHelper.Ignore;
 
-public class FetchableProject
+public class FetchableProject implements IQFetchable<IProject>
 {
 	protected final String name, slug, avatar, author;
 	@Ignore
@@ -22,6 +25,7 @@ public class FetchableProject
 		this.author = author;
 	}
 	
+	@Override
 	public Fetchable<IProject> fetch()
 	{
 		return project;

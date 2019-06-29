@@ -2,16 +2,14 @@ package com.zeitheron.curseforge.api;
 
 import java.util.List;
 
-import com.zeitheron.curseforge.data.Fetchable;
-import com.zeitheron.curseforge.data.FetchableProject;
+import com.zeitheron.curseforge.data.project.FetchableProject;
+import com.zeitheron.curseforge.data.utils.Fetchable;
 
 public interface IProjectList
 {
 	String category();
 	
 	int page();
-	
-	IGameVersion version();
 	
 	EnumSortRule sorting();
 	

@@ -1,10 +1,10 @@
-package com.zeitheron.curseforge.data;
+package com.zeitheron.curseforge.data.utils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
 
-class ToStringHelper
+public class ToStringHelper
 {
 	public static String toString(Object obj)
 	{

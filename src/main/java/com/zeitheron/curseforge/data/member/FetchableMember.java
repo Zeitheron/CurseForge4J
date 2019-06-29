@@ -1,10 +1,13 @@
-package com.zeitheron.curseforge.data;
+package com.zeitheron.curseforge.data.member;
 
 import com.zeitheron.curseforge.api.ICurseForge;
 import com.zeitheron.curseforge.api.IMember;
-import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
+import com.zeitheron.curseforge.api.IQFetchable;
+import com.zeitheron.curseforge.data.utils.Fetchable;
+import com.zeitheron.curseforge.data.utils.ToStringHelper;
+import com.zeitheron.curseforge.data.utils.ToStringHelper.Ignore;
 
-public class FetchableMember
+public class FetchableMember implements IQFetchable<IMember>
 {
 	protected final String name, role;
 	@Ignore
@@ -20,6 +23,7 @@ public class FetchableMember
 		this.member = cf.member(this.name);
 	}
 	
+	@Override
 	public Fetchable<IMember> fetch()
 	{
 		return member;

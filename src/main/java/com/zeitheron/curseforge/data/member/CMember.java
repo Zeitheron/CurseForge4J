@@ -1,4 +1,4 @@
-package com.zeitheron.curseforge.data;
+package com.zeitheron.curseforge.data.member;
 
 import java.util.Date;
 import java.util.List;
@@ -6,7 +6,10 @@ import java.util.function.Supplier;
 
 import com.zeitheron.curseforge.api.ICurseForge;
 import com.zeitheron.curseforge.api.IMember;
-import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
+import com.zeitheron.curseforge.data.project.FetchableProject;
+import com.zeitheron.curseforge.data.utils.Fetchable;
+import com.zeitheron.curseforge.data.utils.ToStringHelper;
+import com.zeitheron.curseforge.data.utils.ToStringHelper.Ignore;
 
 public class CMember implements IMember
 {
@@ -83,9 +86,9 @@ public class CMember implements IMember
 	}
 	
 	@Override
-	public List<FetchableProject> projects()
+	public Fetchable<List<FetchableProject>> projects()
 	{
-		return projects.get();
+		return projects;
 	}
 	
 	@Override

@@ -1,4 +1,4 @@
-package com.zeitheron.curseforge.data;
+package com.zeitheron.curseforge.data.utils;
 
 import java.util.concurrent.TimeUnit;
 

@@ -1,13 +1,15 @@
-package com.zeitheron.curseforge.data;
+package com.zeitheron.curseforge.data.project;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.zeitheron.curseforge.CurseforgeAPI;
 import com.zeitheron.curseforge.api.ICurseForge;
 import com.zeitheron.curseforge.api.IProject;
-import com.zeitheron.curseforge.data.ToStringHelper.Ignore;
+import com.zeitheron.curseforge.data.InternalCFA;
+import com.zeitheron.curseforge.data.utils.Fetchable;
+import com.zeitheron.curseforge.data.utils.ToStringHelper;
+import com.zeitheron.curseforge.data.utils.ToStringHelper.Ignore;
 
 public class ProjectFilePage
 {
@@ -29,8 +31,8 @@ public class ProjectFilePage
 			else
 				pg = ICurseForge.getPage(project.url() + "/files/all?page=" + page, true);
 			List<String> fis = new ArrayList<>();
-			for(String sub : CurseforgeAPI.$cptrs(pg, "<a data-action=\"file-link\" href=\"", "</a>"))
-				fis.add(CurseforgeAPI.$cptr(sub, "/files/", "\">"));
+			for(String sub : InternalCFA.$cptrs(pg, "<a data-action=\"file-link\" href=\"", "</a>"))
+				fis.add(InternalCFA.$cptr(sub, "/files/", "\">"));
 			return fis.stream().map(fi -> new FetchableFile(project, fi)).collect(Collectors.toList());
 		});
 	}
