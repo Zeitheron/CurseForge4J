@@ -3,6 +3,8 @@ package com.zeitheron.curseforge.data;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,9 +14,28 @@ import com.zeitheron.curseforge.api.ICurseForge;
 
 public class InternalCFA
 {
+	private static final Date RELEASE_DATE;
+	
+	static
+	{
+		Date d = null;
+		try
+		{
+			d = new SimpleDateFormat("yyy.MM.dd hh:mm").parse("2019.07.03 15:55");
+		} catch(ParseException e)
+		{
+		}
+		RELEASE_DATE = d;
+	}
+	
 	public static String version()
 	{
 		return "v1.5.2";
+	}
+	
+	public static Date releaseDate()
+	{
+		return RELEASE_DATE;
 	}
 	
 	public static ICurseForge www(CurseForgePrefs prefs)
