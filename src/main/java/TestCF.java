@@ -26,6 +26,9 @@ public class TestCF
 			prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
 			ICurseForge mc = CurseForgeAPI.create(prefs);
 			
+			System.out.println(mc.member("Trikzon").get());
+			System.out.println(mc.member("Zeitheron").get());
+			
 			// Test Search
 			testSearch(mc);
 			
@@ -35,9 +38,6 @@ public class TestCF
 			
 			for(int i = 0; i < 8; ++i)
 				System.out.println();
-			
-			System.out.println(mc.member("Ircmaan").get());
-			System.out.println(mc.member("Zeitheron").get());
 			
 			for(int i = 0; i < 8; ++i)
 				System.out.println();

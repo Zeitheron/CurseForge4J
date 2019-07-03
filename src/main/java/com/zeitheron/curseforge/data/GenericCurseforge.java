@@ -162,17 +162,17 @@ public class GenericCurseforge implements ICurseForge
 				Date lastActive = InternalCFA.$abbr(InternalCFA.$cptr(page, "Last active <abbr class=\"tip standard-datetime-precise\" title=\"", "\">"));
 				
 				String followersStr = InternalCFA.$cptr(page, "<div class=\"followers w-1/3 border-r text-center p-3 border-gray--100\"><span>", "</span>");
-				long followers = Long.parseLong(followersStr.split(" ")[0]);
+				long followers = getLong(followersStr.split(" ")[0]);
 				
 				String postsStr = InternalCFA.$cptr(page, "<div class=\"posts w-1/3 border-r text-center p-3 border-gray--100\"><span class=\"tip\" title=\"(", "\">");
 				String[] postMeta$ = postsStr.split(", ");
-				long comments = Long.parseLong(postMeta$[0].split(" ")[0].substring(1));
-				long forumPosts = Long.parseLong(postMeta$[1].split(" ")[0]);
+				long comments = getLong(postMeta$[0].split(" ")[0].substring(1));
+				long forumPosts = getLong(postMeta$[1].split(" ")[0]);
 				
 				String likesStr = InternalCFA.$cptr(page, "<div class=\"likes w-1/3 text-center p-3 border-gray--100\"><span class=\"tip\" title=\"(", ")\">");
 				String[] likeMeta$ = likesStr.split(", ");
-				long th_rcv = Long.parseLong(likeMeta$[0].split(" ")[0]);
-				long th_gvn = Long.parseLong(likeMeta$[1].split(" ")[0]);
+				long th_rcv = getLong(likeMeta$[0].split(" ")[0]);
+				long th_gvn = getLong(likeMeta$[1].split(" ")[0]);
 				
 				Supplier<List<FetchableProject>> projects = () ->
 				{
@@ -273,5 +273,16 @@ public class GenericCurseforge implements ICurseForge
 				return Collections.unmodifiableList(games);
 			});
 		return games;
+	}
+	
+	private long getLong(String str)
+	{
+		try
+		{
+			return Long.parseLong(str);
+		} catch(NumberFormatException nfe)
+		{
+			return 0L;
+		}
 	}
 }

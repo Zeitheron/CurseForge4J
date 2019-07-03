@@ -14,7 +14,7 @@ public class InternalCFA
 {
 	public static String version()
 	{
-		return "v1.5.1";
+		return "v1.5.2";
 	}
 	
 	public static ICurseForge www(CurseForgePrefs prefs)
