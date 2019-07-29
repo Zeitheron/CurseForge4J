@@ -31,7 +31,7 @@ public class ProjectFilePage
 			else
 				pg = ICurseForge.getPage(project.url() + "/files/all?page=" + page, true);
 			List<String> fis = new ArrayList<>();
-			for(String sub : InternalCFA.$cptrs(pg, "<a data-action=\"file-link\" href=\"", "</a>"))
+			for(String sub : InternalCFA.$cptrs(pg, "<td><a data-action=\"", "</a>"))
 				fis.add(InternalCFA.$cptr(sub, "/files/", "\">"));
 			return fis.stream().map(fi -> new FetchableFile(project, fi)).collect(Collectors.toList());
 		});

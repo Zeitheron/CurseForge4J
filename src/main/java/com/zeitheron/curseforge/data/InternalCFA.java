@@ -21,7 +21,7 @@ public class InternalCFA
 		Date d = null;
 		try
 		{
-			d = new SimpleDateFormat("yyy.MM.dd hh:mm").parse("2019.07.03 15:55");
+			d = new SimpleDateFormat("yyy.MM.dd hh:mm").parse("2019.07.29 12:33");
 		} catch(ParseException e)
 		{
 		}
@@ -30,7 +30,7 @@ public class InternalCFA
 	
 	public static String version()
 	{
-		return "v1.5.2";
+		return "v1.5.3";
 	}
 	
 	public static Date releaseDate()

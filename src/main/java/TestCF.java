@@ -26,15 +26,19 @@ public class TestCF
 			prefs.setCacheLifespan(new TimeHolder(10L, TimeUnit.MINUTES));
 			ICurseForge mc = CurseForgeAPI.create(prefs);
 			
+			System.out.println(mc.project(299755L).get().files().latestNow());
+			
+			System.out.println("Release date: " + CurseForgeAPI.releaseDate());
+			
 			System.out.println(mc.member("Trikzon").get());
 			System.out.println(mc.member("Zeitheron").get());
 			
 			// Test Search
-			testSearch(mc);
+//			testSearch(mc);
 			
 			// Run first iteration - it is going to be slow, since we cache
 			// everything
-			test(mc);
+//			test(mc);
 			
 			for(int i = 0; i < 8; ++i)
 				System.out.println();

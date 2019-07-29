@@ -34,7 +34,7 @@ public class ProjectFiles
 			ints.sort((a, b) -> b - a);
 			if(ints.isEmpty() && hasFile)
 				return 1;
-			return ints.isEmpty() ? 0 : ints.get(0);
+			return ints.isEmpty() ? 1 : ints.get(0);
 		});
 	}
 	

@@ -148,21 +148,22 @@ public class CFile implements IProjectFile
 		
 		FetchableMember uploader = null;
 		{
-			String userTag = InternalCFA.$cptr(page, "<div class=\"flex flex-col mr-2\"><span class=\"font-bold text-sm leading-loose mb-1\">Uploaded by</span>", "</span></a></div>");
+			String userTag = InternalCFA.$cptr(page, "<span class=\"font-bold text-sm leading-loose\">Uploaded by</span>", "</span></a></div>");
+			if(userTag != null)
 			for(FetchableMember pm : proj.membersList())
 				if(userTag.contains(pm.name()))
-				{
-					uploader = pm;
-					break;
-				}
+					{
+						uploader = pm;
+						break;
+					}
 		}
 		
-		String downloadsStr = InternalCFA.$cptr(page, "<span class=\"font-bold text-sm leading-loose mb-1\">Downloads</span><span class=\"text-sm\">", "</span>");
+		String downloadsStr = InternalCFA.$cptr(page, "<span class=\"font-bold text-sm leading-loose\">Downloads</span><span class=\"text-sm\">", "</span>");
 		long downloads = Long.parseLong(downloadsStr.replaceAll(",", "").replaceAll(" ", ""));
 		
-		String md5 = InternalCFA.$cptr(page, "<div class=\"flex flex-col\"><span class=\"font-bold text-sm leading-loose mb-1\">MD5</span><span class=\"text-sm\">", "</span>");
+		String md5 = InternalCFA.$cptr(page, "<span class=\"font-bold text-sm leading-loose\">MD5</span><span class=\"text-sm\">", "</span>");
 		
-		Date uploaded = InternalCFA.$abbr(InternalCFA.$cptr(page, "<div class=\"info-label\">Uploaded</div>", "</abbr></div>"));
+		Date uploaded = InternalCFA.$abbr(InternalCFA.$cptr(page, "<span class=\"font-bold text-sm leading-loose\">Uploaded</span>", "</abbr></div>"));
 		
 		List<String> fis = new ArrayList<>();
 		
@@ -172,7 +173,7 @@ public class CFile implements IProjectFile
 		fis.removeIf(s -> s.contains("?"));
 		
 		String changelog = InternalCFA.$rlnk(InternalCFA.$cptr(page, "<h4 class=\"font-bold text-sm mb-2\">Changelog</h4><div class=\"bg-accent rounded py-1 pl-1 border-primary-100 border text-gray-500\"><div class=\"user-content min max-h-60 overflow-auto block\">", "</div></div></div>"));
-		String size = InternalCFA.$cptr(page, "<div class=\"flex flex-col mr-2\"><span class=\"font-bold text-sm leading-loose mb-1\">Size</span><span class=\"text-sm\">", "</span>");
+		String size = InternalCFA.$cptr(page, "<span class=\"font-bold text-sm leading-loose\">Size</span><span class=\"text-sm\">", "</span>");
 		
 		return new CFile(proj, id, displayName == null || displayName.isEmpty() ? fileName : displayName, fileName, md5, uploaded, downloads, fis, uploader, changelog, size);
 	}
